@@ -2,7 +2,7 @@ services:
   aspen-dev-box:
     image: aspendiscovery/aspen
     volumes:
-      - "$ASPEN_DOCKER/dockerrun.sh:/start.sh"
+      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
       - "$ASPEN_CLONE:/usr/local/aspen-discovery"
       - "$ASPEN_DOCKER/site/:/usr/local/aspen-discovery/sites/test.localhostaspen"
       - "$ASPEN_DOCKER/etc/apache2/sites-enabled:/etc/apache2/sites-enabled"
