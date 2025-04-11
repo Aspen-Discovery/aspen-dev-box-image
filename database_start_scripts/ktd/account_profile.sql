@@ -1,5 +1,3 @@
-INSERT INTO account_profiles(id,name,driver,loginConfiguration,authenticationMethod,vendorOpacUrl,patronApiUrl,recordSource,weight,databaseHost,databaseName,databaseUser,databasePassword,sipHost,sipPort,sipUser,sipPassword,databasePort,databaseTimezone,oAuthClientId,oAuthClientSecret,ils,apiVersion,staffUsername,staffPassword,workstationId,domain)
-VALUES(2,'ils','Koha','barcode_pin','ils','http://kohadev-koha-1:8080','http://kohadev-koha-1:8080','ils',1,'kohadev-db-1','koha_kohadev','koha_kohadev','password',NULL,NULL,NULL,NULL,3306,'GMT',NULL,NULL,'koha',NULL,NULL,NULL,NULL,NULL);
 UNLOCK TABLES;
 LOCK TABLES indexing_profiles WRITE;
 INSERT INTO indexing_profiles (id, name, marcPath, marcEncoding, indexingClass, recordUrlComponent, formatSource, recordNumberTag, itemTag, itemRecordNumber, useItemBasedCallNumbers, callNumber, location, shelvingLocation,collection, volume, barcode, totalCheckouts, totalRenewals, iType, dueDate, dateCreated, dateCreatedFormat, format, catalogDriver, filenamesToInclude, doAutomaticEcontentSuppression, recordNumberSubfield, recordNumberPrefix, noteSubfield, lastCheckinFormat, runFullUpdate) VALUES (1,'ils','/data/aspen-discovery/test.localhostaspen/ils/marc','UTF8','Koha','Record','item','999','952','9',1,'o','a','c','8','h','p','l','m','y','k','d','yyyy-MM-dd','y','Koha','.*\\.ma?rc',1,'c', '', 'z', '',1);
@@ -14,4 +12,4 @@ LOCK TABLES translation_maps WRITE;
 INSERT INTO translation_maps VALUES (1,1,'location',0),(2,1,'sub_location',0),(3,1,'shelf_location',0),(5,1,'itype',0);
 UNLOCK TABLES;
 
-UPDATE modules set enabled = 1 where name = 'Koha';
+UPDATE modules set enabled = 1 where name = 'Koha'; 
