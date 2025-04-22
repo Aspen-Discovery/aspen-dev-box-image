@@ -40,7 +40,7 @@ git clone https://github.com/Aspen-Discovery/aspen-dev-box-image.git aspen-dev-b
 
 ```shell
 cd $PROJECTS_DIR
-git clone https://github.com/mdnoble73/aspen-discovery.git aspen-discovery
+git clone https://github.com/Aspen-Discovery/aspen-discovery.git aspen-discovery
 ```
 
 * Set some **mandatory** environment variables in your .bashrc:
@@ -65,9 +65,9 @@ docker compose up
 ## USAGE:
 This project exposes port 8083 and 8084: 
 
-* `localhost:8083` will take you to the discovery page where you can interact with aspen-discovery
+* [localhost:8083](http://localhost:8083) will take you to the discovery page where you can interact with aspen-discovery
 
-* `localhost:8084` will take you to the solr dashboard.
+* [localhost:8084](http://localhost:8084) will take you to the solr dashboard.
 
 * Running `newSQL.sh` will update the DB setup file to the latest version contained within your aspen-discovery clone.
 
