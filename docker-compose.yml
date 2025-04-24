@@ -12,7 +12,7 @@ services:
       - "8083:80"
     container_name: containeraspen
     networks:
-      - aspennet
+      - aspen-net
     platform: linux/x86_64
     tty: true
     depends_on:
@@ -26,18 +26,15 @@ services:
       - MARIADB_DATABASE=aspen
       - MARIADB_USER=aspensuper
       - MARIADB_PASSWORD=aspensuper
-      - KOHA_STACK=${KOHA_STACK:-kohadev}
     image: "mariadb"
     volumes:
       - $ASPEN_CLONE/install/aspen.sql:/docker-entrypoint-initdb.d/Aspen-db-startup.sql
-      - $ASPEN_DOCKER/database_start_scripts/ktd/account_profile.sql:/docker-entrypoint-initdb.d/zzz-init_account_profile.sql
-      - $ASPEN_DOCKER/database_start_scripts/ktd/setup_koha_connection.sh:/docker-entrypoint-initdb.d/zzz-setup_koha_connection.sh
     healthcheck:
       interval: 60s
       retries: 10
       test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
     networks:
-      - aspennet
+      - aspen-net
     platform: linux/x86_64
 
   solr:
@@ -51,11 +48,11 @@ services:
       endpoint_mode: dnsrr
     platform: linux/x86_64
     networks:
-      - aspennet
+      - aspen-net
     depends_on:
       - aspen-dev-box
 
 networks:
-  aspennet:
-    name: ${KOHA_STACK:-kohadev}_kohanet
-    external: true
+  aspen-net:
+    name: aspen-net
+    driver: bridge

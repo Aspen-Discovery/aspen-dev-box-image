@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  aspen-dev-box:
+    volumes:
+      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
+      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
+      - "$ASPEN_DOCKER/site/evergreen/:/usr/local/aspen-discovery/sites/test.localhostaspen"
+      - "$ASPEN_DOCKER/site/evergreen/conf/crontab_settings.txt:/etc/cron.d/cron"
+      - "$ASPEN_DOCKER/aliases:/root/.bashrc"
+    networks:
+      - aspen-net
+      - evergreen-net
+
+  aspen-db:
+    volumes:
+      - $ASPEN_DOCKER/database_start_scripts/evergreen/setup_evergreen_connection.sh:/docker-entrypoint-initdb.d/zzz-setup_evergreen_connection.sh
+    networks:
+      - aspen-net
+      - evergreen-net
+
+  evergreen-ils:
+    stdin_open: true
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "210:210"
+      - "6001:6001"
+      - "32:22"
+      - "5433:5432"
+    hostname: app.evergreen.com
+    image: mobiusoffice/evergreen-ils
+    networks:
+      - evergreen-net
+
+networks:
+  evergreen-net:
+    name: evergreen-net
+    driver: bridge 

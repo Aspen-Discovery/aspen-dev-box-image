@@ -1,0 +1,44 @@
+LOCK TABLES account_profiles WRITE;
+INSERT INTO account_profiles (id,name,driver,loginConfiguration,authenticationMethod,vendorOpacUrl,patronApiUrl,recordSource,weight,databaseHost,databaseName,databaseUser,databasePassword,sipHost,sipPort,sipUser,sipPassword,databasePort,databaseTimezone,oAuthClientId,oAuthClientSecret,ils,apiVersion,staffUsername,staffPassword,workstationId,domain,libraryForRecordingPayments,ssoSettingId,iiiLoginConfiguration,overrideCode,carlXViewVersion)
+VALUES (2,'ils','Evergreen','barcode_pin','ils','http://aspen-dev-box-evergreen-ils-1/eg/opac/home','http://aspen-dev-box-evergreen-ils-1','ils',2,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'GMT',NULL,NULL,'evergreen',NULL,"admin","demo123",NULL,NULL,1,-1,'barcode_pin','','');
+UNLOCK TABLES;
+
+LOCK TABLES indexing_profiles WRITE;
+INSERT INTO indexing_profiles (id,name,marcPath,marcEncoding,indexingClass,recordUrlComponent,formatSource,recordNumberTag,recordNumberPrefix,itemTag,itemRecordNumber,useItemBasedCallNumbers,callNumberPrestamp,callNumber,callNumberCutter,callNumberPoststamp,location,locationsToSuppress,subLocation,shelvingLocation,volume,itemUrl,barcode,status,statusesToSuppress,totalCheckouts,lastYearCheckouts,yearToDateCheckouts,totalRenewals,iType,dueDate,dateCreated,dateCreatedFormat,iCode2,useICode2Suppression,format,eContentDescriptor,orderTag,orderStatus,orderLocation,orderCopies,orderCode3,collection,catalogDriver,nonHoldableITypes,nonHoldableStatuses,nonHoldableLocations,lastCheckinFormat,lastCheckinDate,orderLocationSingle,specifiedFormat,specifiedFormatCategory,specifiedFormatBoost,filenamesToInclude,collectionsToSuppress,dueDateFormat,doAutomaticEcontentSuppression,iTypesToSuppress,iCode2sToSuppress,bCode3sToSuppress,sierraRecordFixedFieldsTag,bCode3,recordNumberField,recordNumberSubfield,runFullUpdate,lastUpdateOfChangedRecords,lastUpdateOfAllRecords,lastUpdateFromMarcExport,treatUnknownLanguageAs,treatUndeterminedLanguageAs,checkRecordForLargePrint,determineAudienceBy,audienceSubfield,includeLocationNameInDetailedLocation,lastVolumeExportTimestamp,lastUpdateOfAuthorities,regroupAllRecords,fullMarcExportRecordIdThreshold,lastChangeProcessed,noteSubfield,treatUnknownAudienceAs,suppressRecordsWithUrlsMatching,determineLiteraryFormBy,literaryFormSubfield,hideUnknownLiteraryForm,hideNotCodedLiteraryForm,fallbackFormatField,treatLibraryUseOnlyGroupedStatusesAsAvailable,customMarcFieldsToIndexAsKeyword,processRecordLinking,evergreenOrgUnitSchema,index856Links,includePersonalAndCorporateNamesInTopics,orderRecordsStatusesToInclude,hideOrderRecordsForBibsWithPhysicalItems,orderRecordsToSuppressByDate,checkSierraMatTypeForFormat,customFacet1SourceField,customFacet1ValuesToInclude,customFacet1ValuesToExclude,customFacet2SourceField,customFacet2ValuesToInclude,customFacet2ValuesToExclude,customFacet3SourceField,customFacet3ValuesToInclude,customFacet3ValuesToExclude,callNumberPrestamp2,itemUrlDescription,numRetriesForBibLookups,numMillisecondsToPauseAfterBibLookups,numExtractionThreads,orderRecordStatusToTreatAsUnderConsideration,bibCallNumberFields,replacementCostSubfield)
+VALUES ("2","ils","/data/aspen-discovery/site.test/ils/marc","MARC8","Evergreen","Record","bib","901","","852","p","1","k","j","","m","b","COMCAT","","c","","","p","s","","","","","","g","","","","","1","g","","","","","","","c","Evergreen","","Bindery|ILL|Cataloging|Reserves|Walkin Loan|View Online|Library Use Only|Offsite|Claimed Returned|INN-Reach Offsite|Cancelled|Ask Your Library|On reservation shelf","","","","","","0","1",".*\.ma?rc","","","1","","","",NULL,NULL,"a","c","0","1738346783","1738090852","1736064000","English","English","1","0","","1","1736139913","0","0","5122468","0","z","General","overdrive.com|contentreserve.com|hoopla|axis360.baker-taylor.com|kanopy.com|ebscohost.com","0","","1","1","","1","010z:020z:024z:028z","0","2","1","1","o|1","0","1","0","655$7a",".*","","250a","(^\[Hardcover edition\]$|^\[Paperback edition\]$)","","",".*","","","","0","50","5","","99:92:82","y");
+UNLOCK TABLES;
+
+LOCK TABLES library_records_to_include WRITE;
+INSERT INTO library_records_to_include (id,libraryId,indexingProfileId,location,subLocation,includeHoldableOnly,includeItemsOnOrder,includeEContent,weight,iType,audience,format,marcTagToMatch,marcValueToMatch,includeExcludeMatches,urlToMatch,urlReplacement,locationsToExclude,subLocationsToExclude,markRecordsAsOwned)
+VALUES (1,1,1,'.*','.*',0,1,1,1,'','','','','',1,'','','','',1);
+UNLOCK TABLES;
+
+LOCK TABLES status_map_values WRITE;
+INSERT INTO status_map_values (id,indexingProfileId,value,status,groupedStatus,suppress)
+VALUES 
+(1,1,'Checked Out','Checked Out','Checked Out',0),
+(2,1,'Claims Returned','Claims Returned','Currently Unavailable',1),
+(3,1,'On Shelf','On Shelf','On Shelf',0),
+(4,1,'Damaged','Damaged','Currently Unavailable',1),
+(5,1,'In Transit','In Transit','In Transit',0),
+(6,1,'Library Use Only','Library Use Only','Library Use Only',0),
+(7,1,'Long Overdue (Lost)','Long Overdue (Lost)','Currently Unavailable',1),
+(8,1,'Lost','Lost','Currently Unavailable',1),
+(9,1,'Lost and Paid For','Lost and Paid For','Currently Unavailable',1),
+(10,1,'Missing','Missing','Currently Unavailable',1),
+(11,1,'On Hold Shelf','On Hold Shelf','Checked Out',0),
+(12,1,'On Order','On Order','On Order',0),
+(13,1,'Discard','Discard','Currently Unavailable',1),
+(14,1,'Lost Claim','Lost Claim','Currently Unavailable',1);
+UNLOCK TABLES;
+
+LOCK TABLES translation_maps WRITE;
+INSERT INTO translation_maps
+VALUES 
+(1,1,'location',0),
+(2,1,'sub_location',0),
+(3,1,'shelf_location',0),
+(5,1,'itype',0);
+UNLOCK TABLES;
+
+UPDATE modules set enabled = 1 where name = 'Evergreen'; 
