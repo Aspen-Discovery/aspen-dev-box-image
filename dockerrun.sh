@@ -9,6 +9,8 @@ service cron start
 ./usr/local/aspen-discovery/install/setup_aspen_user_debian.sh
 
 mkdir -p /data/aspen-discovery/test.localhostaspen/covers/{small,large,medium,original}
+mkdir -p /data/aspen-discovery/test.localhostaspen/solr7
+mkdir -p /data/aspen-discovery/test.localhostaspen/ils/{marc,marc_delta,marc_recs,supplemental}
 
 mkdir -p /usr/local/aspen-discovery/tmp/smarty/compile/
 
