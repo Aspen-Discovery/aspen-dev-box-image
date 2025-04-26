@@ -196,7 +196,7 @@ INSERT INTO indexing_profiles(
 ) VALUES(
     2,
     'ils',
-    '/data/aspen-discovery/site.test/ils/marc',
+    '/data/aspen-discovery/test.localhostaspen/ils/marc',
     'MARC8',
     'Evergreen',
     'Record',
@@ -390,4 +390,4 @@ INSERT INTO translation_maps VALUES
 UPDATE modules SET enabled = 1 WHERE name = 'Evergreen';
 EOF
 
-echo "Configured Evergreen connection" 
+echo "Configured Evergreen connection"
