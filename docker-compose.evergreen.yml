@@ -7,8 +7,7 @@ services:
       - "$ASPEN_DOCKER/site/evergreen/:/usr/local/aspen-discovery/sites/test.localhostaspen"
       - "$ASPEN_DOCKER/site/evergreen/conf/crontab_settings.txt:/etc/cron.d/cron"
       - "$ASPEN_DOCKER/aliases:/root/.bashrc"
-      - "$ASPEN_DOCKER/tmp:/mnt/tmp"
-      - "$ASPEN_DOCKER/../aspen_export:/mnt/aspen_export"
+      - "$ASPEN_DOCKER/export_utils:/mnt/export_utils"
     networks:
       - aspen-net
       - evergreen-net
@@ -33,8 +32,7 @@ services:
     hostname: app.evergreen.com
     image: mobiusoffice/evergreen-ils
     volumes:
-      - "$ASPEN_DOCKER/tmp:/mnt/tmp"
-      - "$ASPEN_DOCKER/../aspen_export:/mnt/aspen_export"
+      - "$ASPEN_DOCKER/export_utils:/mnt/export_utils"
     networks:
       - evergreen-net
 
