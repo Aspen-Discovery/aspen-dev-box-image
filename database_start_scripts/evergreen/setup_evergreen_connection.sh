@@ -247,7 +247,7 @@ INSERT INTO indexing_profiles(
     '',
     null,
     null,
-    '.*\\.ma?rc',
+    '.*\\\\.ma?rc',
     '',
     '',
     0,
@@ -306,7 +306,7 @@ INSERT INTO indexing_profiles(
     50,
     5,
     '',
-    '99:92:82',
+    '099:092:082',
     'y'
 );
 
