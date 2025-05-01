@@ -8,6 +8,7 @@ services:
       - "$ASPEN_DOCKER/etc/apache2/sites-enabled:/etc/apache2/sites-enabled"
       - "$ASPEN_DOCKER/site/conf/crontab_settings.txt:/etc/cron.d/cron"
       - "$ASPEN_DOCKER/aliases:/root/.bashrc"
+      - "$ASPEN_DOCKER/tmp:/mnt/tmp"
     ports:
       - "8083:80"
     container_name: containeraspen
