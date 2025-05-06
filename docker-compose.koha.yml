@@ -3,11 +3,11 @@ version: '3.8'
 services:
   aspen-dev-box:
     volumes:
-      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
-      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
-      - "$ASPEN_DOCKER/site/ktd/:/usr/local/aspen-discovery/sites/test.localhostaspen"
-      - "$ASPEN_DOCKER/site/ktd/conf/crontab_settings.txt:/etc/cron.d/cron"
-      - "$ASPEN_DOCKER/aliases:/root/.bashrc"
+      - "${ASPEN_DOCKER:-.}/dockerrun.sh:/entrypoint.sh"
+      - "${ASPEN_CLONE:-../aspen-discovery}:/usr/local/aspen-discovery"
+      - "${ASPEN_DOCKER:-.}/site/ktd/:/usr/local/aspen-discovery/sites/test.localhostaspen"
+      - "${ASPEN_DOCKER:-.}/site/ktd/conf/crontab_settings.txt:/etc/cron.d/cron"
+      - "${ASPEN_DOCKER:-.}/aliases:/root/.bashrc"
     networks:
       - aspen-net
       - kohanet
@@ -16,7 +16,7 @@ services:
     environment:
       - KOHA_STACK=${KOHA_STACK:-kohadev}
     volumes:
-      - $ASPEN_DOCKER/database_start_scripts/ktd/setup_koha_connection.sh:/docker-entrypoint-initdb.d/zzz-setup_koha_connection.sh
+      - ${ASPEN_DOCKER:-.}/database_start_scripts/ktd/setup_koha_connection.sh:/docker-entrypoint-initdb.d/zzz-setup_koha_connection.sh
     networks:
       - aspen-net
       - kohanet

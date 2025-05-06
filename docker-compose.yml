@@ -2,13 +2,13 @@ services:
   aspen-dev-box:
     image: aspendiscovery/aspen
     volumes:
-      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
-      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
-      - "$ASPEN_DOCKER/site/:/usr/local/aspen-discovery/sites/test.localhostaspen"
-      - "$ASPEN_DOCKER/etc/apache2/sites-enabled:/etc/apache2/sites-enabled"
-      - "$ASPEN_DOCKER/site/conf/crontab_settings.txt:/etc/cron.d/cron"
-      - "$ASPEN_DOCKER/aliases:/root/.bashrc"
-      - "$ASPEN_DOCKER/tmp:/mnt/tmp"
+      - "${ASPEN_DOCKER:-.}/dockerrun.sh:/entrypoint.sh"
+      - "${ASPEN_CLONE:-../aspen-discovery}:/usr/local/aspen-discovery"
+      - "${ASPEN_DOCKER:-.}/site/:/usr/local/aspen-discovery/sites/test.localhostaspen"
+      - "${ASPEN_DOCKER:-.}/etc/apache2/sites-enabled:/etc/apache2/sites-enabled"
+      - "${ASPEN_DOCKER:-.}/site/conf/crontab_settings.txt:/etc/cron.d/cron"
+      - "${ASPEN_DOCKER:-.}/aliases:/root/.bashrc"
+      - "${ASPEN_DOCKER:-.}/tmp:/mnt/tmp"
     ports:
       - "8083:80"
     container_name: containeraspen
@@ -29,7 +29,7 @@ services:
       - MARIADB_PASSWORD=aspensuper
     image: "mariadb"
     volumes:
-      - $ASPEN_CLONE/install/aspen.sql:/docker-entrypoint-initdb.d/Aspen-db-startup.sql
+      - ${ASPEN_CLONE:-../aspen-discovery}/install/aspen.sql:/docker-entrypoint-initdb.d/Aspen-db-startup.sql
     healthcheck:
       interval: 60s
       retries: 10
