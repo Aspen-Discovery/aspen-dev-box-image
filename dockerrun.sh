@@ -24,6 +24,9 @@ chmod -R a+wr /data/aspen-discovery/test.localhostaspen/
 
 chown -R aspen /data/aspen-discovery/test.localhostaspen/solr7
 
+mkdir -p /var/run/aspen/
+chown -R aspen:aspen /var/run/aspen/
+
 service apache2 start
 
 curl -k http://localhost/API/SystemAPI?method=runPendingDatabaseUpdates

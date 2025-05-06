@@ -85,10 +85,10 @@
 
 
 #########################
-# TEST RUNNING KOHA EXPORT #
+# TEST RUNNING EVERGREEN EXPORT #
 #########################
 
-*/2 * * * * su aspen -c "cd /usr/local/aspen-discovery/code/evergreen_export && java -jar evergreen_export.jar test.localhostaspen";
-*/1 * * * * /bin/echo -e "cron working" >> /var/log/aspen-discovery/test.localhostaspen/cron.log;
+#*/2 * * * * su aspen -c "cd /usr/local/aspen-discovery/code/evergreen_export && java -jar evergreen_export.jar test.localhostaspen";
+*/2 * * * * su aspen -c /usr/local/aspen-discovery/sites/test.localhostaspen/start_evergreen_export.sh
+#*/1 * * * * /bin/echo -e "cron working" >> /var/log/aspen-discovery/test.localhostaspen/cron.log;
 */1 * * * * su aspen -c "cd /usr/local/aspen-discovery/sites/test.localhostaspen && ./test.localhostaspen.sh start";
-
