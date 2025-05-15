@@ -1,6 +1,6 @@
 # Evergreen Server with sample data in 5 minutes
 
-0. install Docker
+0. install Docker, e.g. [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 1. pull the Evergreen server image
    ```
    docker compose pull
