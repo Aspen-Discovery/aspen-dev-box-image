@@ -1,0 +1,23 @@
+---
+services:
+
+  evergreen-ils:
+    container_name: evergreen
+    image: mobiusoffice/evergreen-ils
+    stdin_open: true
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "210:210"
+      - "6001:6001"
+      - "32:22"
+      - "5433:5432"
+    hostname: app.evergreen.com
+    networks:
+      - evergreen-net
+
+networks:
+  evergreen-net:
+    name: evergreen-net
+    driver: bridge 
