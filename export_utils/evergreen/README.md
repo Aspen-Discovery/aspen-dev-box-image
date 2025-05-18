@@ -29,10 +29,12 @@
 
 * Edit [Library System HHPL](http://localhost:8083/Admin/Libraries?objectAction=edit&id=2), and mark it as "Default Library".  
 
-## Status Summary
+## Issue Summary
 
 * Search kind of works in that you can find things, e.g. [Search for "Ready Player One"](http://localhost:8083/Union/Search?view=list&showCovers=on&lookfor=Ready+Player+One&searchIndex=Keyword&searchSource=local)
 
 * Issue: the status on items always says "Available from another library"
 
 * Issue: no bookjacket images are displayed, only placeholders
+
+* Issue: placing a hold as user "Thomas Trollshaws" fails with, "This account is not associated with a library, please contact your library.".  That user's home library is SPLS-BPL.  In Evergreen, that is a Branch, but in Aspen, it's a "System"!?
