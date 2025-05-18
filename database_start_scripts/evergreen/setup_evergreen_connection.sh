@@ -197,7 +197,7 @@ INSERT INTO indexing_profiles(
     2,
     'ils',
     '/data/aspen-discovery/test.localhostaspen/ils/marc',
-    'MARC8',
+    'UTF8',
     'Evergreen',
     'Record',
     'bib',
