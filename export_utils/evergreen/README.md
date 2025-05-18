@@ -7,9 +7,10 @@
   docker compose -f docker-compose.yml -f docker-compose.evergreen.yml up -d --force-recreate
   ```
 
-* Wait for
-  * [Aspen to be available](http://localhost:8083)
-  * [Evergreen to be available](https://localhost)
+* Wait for [Aspen](http://localhost:8083) and [Evergreen](https://localhost) to be available.
+    ```
+    bin/wait-until 'curl -qsS localhost:8083' 900 && bin/wait-until 'curl -qsS localhost:80' 900 && echo EVERYTHING IS UP
+    ```
 
 ## Import Records
 
@@ -25,11 +26,11 @@ NB: The "//" in these commands prevents Git Bash on Windows from rewriting paths
   docker exec -it containeraspen //mnt/export_utils/evergreen/aspen_import_weekly.sh
   ```
 
-* Watch the [ILS Export Log](http://localhost:8083/ILS/IndexingLog) page until the importer runs the next time
+* Refresh the [ILS Export Log](http://localhost:8083/ILS/IndexingLog) page until the importer runs the next time
 
 ## Fix up the Hierarchy
 
-* Edit [Library System HHPL](http://localhost:8083/Admin/Libraries?objectAction=edit&id=2), and mark it as "Default Library".  
+* Edit [Library System HHPL](http://localhost:8083/Admin/Libraries?objectAction=edit&id=2), check "Default Library", and Save it
 
 ## Issue Summary
 
