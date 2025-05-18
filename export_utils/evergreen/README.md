@@ -13,6 +13,8 @@
 
 ## Import Records
 
+NB: The "//" in these commands prevents Git Bash on Windows from rewriting paths to Windows-style.
+
 * Run the Evergreen export
   ```
   docker exec -it aspen-dev-box-evergreen-ils-1 //mnt/export_utils/evergreen/weekly.sh

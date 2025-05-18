@@ -8,3 +8,4 @@
 #       See ./README.md
 
 su - aspen -c "cp /mnt/export_utils/evergreen/scratch/* /data/aspen-discovery/test.localhostaspen/ils/marc"
+su - aspen -c "touch /data/aspen-discovery/test.localhostaspen/ils/marc/../supplemental/barcode_active_dates.csv"
