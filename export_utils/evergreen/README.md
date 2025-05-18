@@ -7,10 +7,10 @@
   docker compose -f docker-compose.yml -f docker-compose.evergreen.yml up -d --force-recreate
   ```
 
-* Wait for [Aspen](http://localhost:8083) and [Evergreen](https://localhost) to be available.
-    ```
-    bin/wait-until 'curl -qsS localhost:8083' 900 && bin/wait-until 'curl -qsS localhost:80' 900 && echo EVERYTHING IS UP
-    ```
+* Wait for [Aspen](http://localhost:8083) and [Evergreen](https://localhost) servers to be available.
+  ```
+  bin/wait-until 'curl -qsS localhost:8083' 900 && echo '*** ASPEN IS ALIVE ***' && bin/wait-until 'curl -qsS localhost:80' 900 && echo '*** EVERGREEN IS ALIVE ***'
+  ```
 
 ## Import Records
 
