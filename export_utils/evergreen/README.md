@@ -33,4 +33,6 @@
 
 * Search kind of works in that you can find things, e.g. [Search for "Ready Player One"](http://localhost:8083/Union/Search?view=list&showCovers=on&lookfor=Ready+Player+One&searchIndex=Keyword&searchSource=local)
 
-* But the status always says "Available from another library"
+* Issue: the status on items always says "Available from another library"
+
+* Issue: no bookjacket images are displayed, only placeholders
