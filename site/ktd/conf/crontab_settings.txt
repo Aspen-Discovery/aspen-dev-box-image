@@ -89,6 +89,4 @@
 #########################
 
 */2 * * * * su aspen -c "cd /usr/local/aspen-discovery/code/koha_export && java -jar koha_export.jar test.localhostaspen";
-*/1 * * * * /bin/echo -e "cron working" >> /var/log/aspen-discovery/test.localhostaspen/cron.log;
 */1 * * * * su aspen -c "cd /usr/local/aspen-discovery/sites/test.localhostaspen && ./test.localhostaspen.sh start";
-
