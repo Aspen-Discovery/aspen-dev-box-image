@@ -32,7 +32,7 @@ export PROJECTS_DIR=~/git
 
 ```shell
 cd $PROJECTS_DIR
-git clone https://github.com/mdnoble73/aspen-dev-box-image.git aspen-dev-box
+git clone https://github.com/Aspen-Discovery/aspen-dev-box-image.git aspen-dev-box
 ```
 
 * Clone the `aspen-discovery` project (skip and adjust the paths if you already have it):
@@ -40,7 +40,7 @@ git clone https://github.com/mdnoble73/aspen-dev-box-image.git aspen-dev-box
 
 ```shell
 cd $PROJECTS_DIR
-git clone https://github.com/Aspen-Discovery/aspen-discovery.git aspen-discovery
+git clone https://github.com/mdnoble73/aspen-discovery.git aspen-discovery
 ```
 
 * Set some **mandatory** environment variables in your .bashrc:
