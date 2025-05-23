@@ -3,7 +3,7 @@ services:
   aspen-dev-box:
     volumes:
       - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
-      - "$ASPEN_CLONE/aspen-discovery}:/usr/local/aspen-discovery"
+      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
       - "$ASPEN_DOCKER/site/evergreen/:/usr/local/aspen-discovery/sites/test.localhostaspen"
       - "$ASPEN_DOCKER/site/evergreen/conf/crontab_settings.txt:/etc/cron.d/cron"
       - "$ASPEN_DOCKER/aliases:/root/.bashrc"
