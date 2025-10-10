@@ -1,11 +1,11 @@
 services:
   aspen-dev-box:
-    image: aspendiscovery/aspen
+    image: aspendiscovery/aspen:latest
     volumes:
       - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
+      - "$ASPEN_DOCKER/generate-apache-config.sh:/generate-apache-config.sh"
       - "$ASPEN_CLONE:/usr/local/aspen-discovery"
       - "$ASPEN_DOCKER/site/:/usr/local/aspen-discovery/sites/test.localhostaspen"
-      - "$ASPEN_DOCKER/etc/apache2/sites-enabled:/etc/apache2/sites-enabled"
       - "$ASPEN_DOCKER/site/conf/crontab_settings.txt:/etc/cron.d/cron"
       - "$ASPEN_DOCKER/aliases:/root/.bashrc"
       - "$ASPEN_DOCKER/tmp:/mnt/tmp"
@@ -14,7 +14,6 @@ services:
     container_name: containeraspen
     networks:
       - aspen-net
-    platform: linux/x86_64
     tty: true
     depends_on:
       aspen-db:
@@ -27,7 +26,7 @@ services:
       - MARIADB_DATABASE=aspen
       - MARIADB_USER=aspensuper
       - MARIADB_PASSWORD=aspensuper
-    image: "mariadb"
+    image: "mariadb:10.11.5"
     volumes:
       - $ASPEN_CLONE/install/aspen.sql:/docker-entrypoint-initdb.d/Aspen-db-startup.sql
     healthcheck:
@@ -36,10 +35,9 @@ services:
       test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
     networks:
       - aspen-net
-    platform: linux/x86_64
 
   solr:
-    image: aspendiscovery/solr
+    image: aspendiscovery/solr:latest
     environment:
       - SOLR_PORT=8084
       - SOLR_HOST=solr
@@ -47,7 +45,6 @@ services:
       - "8084:8084"
     deploy:
       endpoint_mode: dnsrr
-    platform: linux/x86_64
     networks:
       - aspen-net
     depends_on:

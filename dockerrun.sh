@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
 
-# This script is used to run the docker container
-# cp -R /test.localhostaspen /usr/local/aspen-discovery/sites
+set -e
+
+SITENAME="${SITENAME:-test.localhostaspen}"
 
 service cron start
 
@@ -14,19 +15,21 @@ mkdir -p /data/aspen-discovery/test.localhostaspen/ils/{marc,marc_delta,marc_rec
 
 mkdir -p /usr/local/aspen-discovery/tmp/smarty/compile/
 
-mkdir -p /var/log/aspen-discovery/test.localhostaspen
+mkdir -p /var/log/aspen-discovery/${SITENAME}
 
 chmod -R a+wr /var/log/
 
-chmod -R a+wr /usr/local/aspen-discovery/
+chmod -R a+wr /usr/local/aspen-discovery/ 2>/dev/null || true
 
-chmod -R a+wr /data/aspen-discovery/test.localhostaspen/
+chmod -R a+wr /data/aspen-discovery/${SITENAME}/
 
-chown -R aspen /data/aspen-discovery/test.localhostaspen/solr7
+chown -R aspen /data/aspen-discovery/${SITENAME}/solr7
 
 mkdir -p /var/run/aspen/
 chown -R aspen:aspen /var/run/aspen/
 
+echo "Generating Apache configuration from template..."
+bash /generate-apache-config.sh
 service apache2 start
 
 curl -k http://localhost/API/SystemAPI?method=runPendingDatabaseUpdates
