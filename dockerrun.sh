@@ -5,9 +5,15 @@ set -e
 
 SITENAME="${SITENAME:-test.localhostaspen}"
 
-service cron start
-
 ./usr/local/aspen-discovery/install/setup_aspen_user_debian.sh
+
+echo "Setting up user permissions..."
+if [[ ! -z "${LOCAL_USER_ID}" && "${LOCAL_USER_ID}" != "33" ]]; then
+    echo "Changing www-data UID to ${LOCAL_USER_ID}"
+    usermod -o -u "${LOCAL_USER_ID}" www-data
+    echo "Changing aspen UID to ${LOCAL_USER_ID}"
+    usermod -o -u "${LOCAL_USER_ID}" aspen
+fi
 
 mkdir -p /data/aspen-discovery/${SITENAME}/covers/{small,large,medium,original}
 mkdir -p /data/aspen-discovery/${SITENAME}/solr7
@@ -17,16 +23,15 @@ mkdir -p /usr/local/aspen-discovery/tmp/smarty/compile/
 
 mkdir -p /var/log/aspen-discovery/${SITENAME}
 
-chmod -R a+wr /var/log/
-
-chmod -R a+wr /usr/local/aspen-discovery/ 2>/dev/null || true
-
-chmod -R a+wr /data/aspen-discovery/${SITENAME}/
-
-chown -R aspen /data/aspen-discovery/${SITENAME}/solr7
+echo "Setting ownership on directories..."
+chown -R www-data:www-data /var/log/aspen-discovery/
+chown -R www-data:www-data /usr/local/aspen-discovery/tmp/
+chown -R aspen:aspen /data/aspen-discovery/${SITENAME}/
 
 mkdir -p /var/run/aspen/
 chown -R aspen:aspen /var/run/aspen/
+
+service cron start
 
 echo "Generating Apache configuration from template..."
 bash /generate-apache-config.sh
