@@ -21,14 +21,15 @@ echo "Generating Apache configuration for site: $SITENAME"
 echo "Using template: $TEMPLATE_FILE"
 echo "Output file: $OUTPUT_FILE"
 
-mkdir -p "${CONFIG_DIR}/conf"
+RUNTIME_CONF_DIR="/etc/aspen-discovery/sites/${SITENAME}"
+mkdir -p "${RUNTIME_CONF_DIR}/conf"
 
 echo "Copying configuration files from template..."
-cp -n "$TEMPLATE_DIR/conf/badBotsLocal.conf" "${CONFIG_DIR}/conf/badBotsLocal.conf" 2>/dev/null || true
+cp "$TEMPLATE_DIR/conf/badBotsLocal.conf" "${RUNTIME_CONF_DIR}/conf/badBotsLocal.conf" 2>/dev/null || true
 
 sed -e "s#{sitename}#${SITENAME}#g" \
     -e "s#{servername}#${SERVERNAME}#g" \
-    -e "s#{configDir}#${CONFIG_DIR}#g" \
+    -e "s#{configDir}#${RUNTIME_CONF_DIR}#g" \
     -e "s#{phpFpmHost}#${PHP_FPM_HOST}#g" \
     -e "s#{phpFpmPort}#${PHP_FPM_PORT}#g" \
     "$TEMPLATE_FILE" > "$OUTPUT_FILE"
