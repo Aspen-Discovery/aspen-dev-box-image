@@ -45,6 +45,8 @@ services:
       - SOLR_HOST=solr
     ports:
       - "8084:8084"
+    volumes:
+      - $ASPEN_CLONE/data_dir_setup/solr7:/opt/solr/server/solr/configsets
     deploy:
       endpoint_mode: dnsrr
     networks:
