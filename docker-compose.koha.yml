@@ -17,6 +17,7 @@ services:
 
   koha-oauth-init:
     image: docker:cli
+    attach: false
     restart: 'no'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
