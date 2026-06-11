@@ -11,10 +11,6 @@ services:
       - kohanet
 
   aspen-db:
-    environment:
-      - KOHA_STACK=${KOHA_STACK:-kohadev}
-    volumes:
-      - $ASPEN_DOCKER/database_start_scripts/ktd/setup_koha_connection.sh:/docker-entrypoint-initdb.d/zzz-setup_koha_connection.sh
     networks:
       - aspen-net
       - kohanet
