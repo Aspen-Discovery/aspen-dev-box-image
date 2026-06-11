@@ -16,7 +16,12 @@ class LibrarySeeder extends BaseType {
 			$library->subdomain = sprintf('seedlib%05d', $n);
 			$library->displayName = sprintf('Seeded Library %d', $n);
 			foreach ($overrides as $k => $v) $library->$k = $v;
-			if ($library->insert()) $created++;
+			if ($library->insert()) {
+				$created++;
+				continue;
+			}
+			fwrite(STDERR, "library insert failed (n=$n): " . $library->getLastError() . "\n");
+			break;
 		}
 		return $created;
 	}
