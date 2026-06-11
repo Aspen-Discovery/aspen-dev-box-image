@@ -1,37 +1,26 @@
 <?php
 
-require_once ROOT_DIR . '/sys/LibraryLocation/Library.php';
-
 class LibrarySeeder extends BaseType {
 	public function name(): string {
 		return 'library';
 	}
 
-	public function build(int $count, array $overrides = []): int {
-		$startIdx = $this->nextIndex();
-		$created = 0;
-		for ($i = 0; $i < $count; $i++) {
-			$n = $startIdx + $i;
-			$library = new Library();
-			$library->subdomain = sprintf('seedlib%05d', $n);
-			$library->displayName = sprintf('Seeded Library %d', $n);
-			foreach ($overrides as $k => $v) $library->$k = $v;
-			if ($library->insert()) {
-				$created++;
-				continue;
-			}
-			fwrite(STDERR, "library insert failed (n=$n): " . $library->getLastError() . "\n");
-			break;
-		}
-		return $created;
+	public function table(): string {
+		return 'library';
 	}
 
-	private function nextIndex(): int {
-		$probe = new Library();
-		$probe->whereAdd("subdomain LIKE 'seedlib%'");
-		$probe->orderBy('subdomain DESC');
-		$probe->limit(0, 1);
-		if (!$probe->find(true)) return 1;
-		return ((int)substr($probe->subdomain, 7)) + 1;
+	public function identity(int $n): array {
+		return [
+			'subdomain' => sprintf('seedlib%05d', $n),
+			'displayName' => sprintf('Seeded Library %d', $n),
+		];
+	}
+
+	protected function nextIndex(): int {
+		global $aspen_db;
+		$stmt = $aspen_db->query("SELECT subdomain FROM library WHERE subdomain LIKE 'seedlib%' ORDER BY subdomain DESC LIMIT 1");
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
+		if (!$row) return 1;
+		return ((int)substr($row['subdomain'], 7)) + 1;
 	}
 }
