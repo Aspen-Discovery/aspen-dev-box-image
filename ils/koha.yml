@@ -1,3 +1,5 @@
+base: _base.yml
+
 driver: Koha
 
 account_profile:
@@ -19,35 +21,7 @@ account_profile:
   ils: koha
 
 indexing_profile:
-  name: ils
   indexingClass: Koha
-  runFullUpdate: 1
-  marcEncoding: UTF8
   catalogDriver: Koha
-  marcPath: /data/aspen-discovery/${SITE_NAME}/ils/marc
-  recordUrlComponent: Record
-  formatSource: item
-  recordNumberTag: '999'
-  itemTag: '952'
-  itemRecordNumber: '9'
-  useItemBasedCallNumbers: 1
-  callNumber: o
-  location: a
-  shelvingLocation: c
-  collection: '8'
-  volume: h
-  barcode: p
-  totalCheckouts: l
-  totalRenewals: m
-  iType: y
-  dueDate: k
-  dateCreated: d
-  dateCreatedFormat: yyyy-MM-dd
-  format: y
-  filenamesToInclude: '.*\\.ma?rc'
-  doAutomaticEcontentSuppression: 1
-  recordNumberSubfield: c
-  noteSubfield: z
-  lastCheckinFormat: ''
 
 extras_sql: ils/extras/koha.sql
