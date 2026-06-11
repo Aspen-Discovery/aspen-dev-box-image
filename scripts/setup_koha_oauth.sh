@@ -26,6 +26,20 @@ if [ -n "$EXISTING" ]; then
 fi
 
 DEADLINE=$(($(date +%s) + 300))
+
+while [ "$(date +%s)" -lt "$DEADLINE" ]; do
+  if docker exec "$KOHA_CONTAINER" test -f /ktd_ready 2>/dev/null; then
+    break
+  fi
+  echo "koha-oauth: waiting for ktd readiness..."
+  sleep 10
+done
+
+if ! docker exec "$KOHA_CONTAINER" test -f /ktd_ready 2>/dev/null; then
+  echo "koha-oauth: ktd never signaled ready, aborting" >&2
+  exit 1
+fi
+
 KEYS=""
 while [ "$(date +%s)" -lt "$DEADLINE" ]; do
   KEYS=$(docker exec -e USER_ID=koha "$KOHA_CONTAINER" perl \
