@@ -5,6 +5,7 @@ class Builder {
 	private array $schemaCache = [];
 	private array $uniqueCache = [];
 	private array $fkCache = [];
+	private array $fkValueCache = [];
 	private array $building = [];
 
 	public function __construct() {
@@ -51,12 +52,18 @@ class Builder {
 	}
 
 	private function resolveForeignKey(array $fk): mixed {
-		$stmt = $this->db->query("SELECT `{$fk['column']}` FROM `{$fk['table']}` LIMIT 1");
-		$existing = $stmt->fetchColumn();
-		if ($existing !== false) return $existing;
+		$key = "{$fk['table']}.{$fk['column']}";
+		if (!isset($this->fkValueCache[$key])) {
+			$stmt = $this->db->query("SELECT `{$fk['column']}` FROM `{$fk['table']}`");
+			$this->fkValueCache[$key] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		}
+		if (!empty($this->fkValueCache[$key])) {
+			return $this->fkValueCache[$key][array_rand($this->fkValueCache[$key])];
+		}
 		if (isset($this->building[$fk['table']])) return null;
 		$id = $this->build($fk['table']);
 		if ($id === false) return null;
+		$this->fkValueCache[$key][] = $id;
 		return $id;
 	}
 
