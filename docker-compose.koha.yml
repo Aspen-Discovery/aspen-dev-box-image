@@ -15,6 +15,19 @@ services:
       - aspen-net
       - kohanet
 
+  koha-oauth-init:
+    image: docker:cli
+    restart: 'no'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "$ASPEN_DOCKER/scripts/setup_koha_oauth.sh:/setup.sh:ro"
+    command: ["sh", "/setup.sh"]
+    environment:
+      - KOHA_STACK=${KOHA_STACK:-kohadev}
+    depends_on:
+      aspen-db:
+        condition: service_healthy
+
 networks:
   aspen-net:
     driver: bridge
