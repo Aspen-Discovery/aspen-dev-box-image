@@ -48,7 +48,6 @@ class Builder {
 
 	private function defaultFor(array $col, bool $unique, int $seq): mixed {
 		$type = strtolower($col['Type']);
-		$suffix = $unique ? sprintf('%06d', microtime(true) * 1000 + $seq) : '';
 		if (str_starts_with($type, 'enum(')) {
 			return $this->firstEnumValue($type);
 		}
@@ -59,7 +58,19 @@ class Builder {
 		if (str_starts_with($type, 'date') && !str_starts_with($type, 'datetime')) return '1970-01-01';
 		if (str_starts_with($type, 'datetime') || str_starts_with($type, 'timestamp')) return '1970-01-01 00:00:00';
 		if (str_starts_with($type, 'time')) return '00:00:00';
-		return $unique ? "seed_$suffix" : '';
+		return $this->randomString($type, $unique, $seq);
+	}
+
+	private function randomString(string $type, bool $unique, int $seq): string {
+		$maxLen = $this->parseLength($type);
+		$random = bin2hex(random_bytes(4));
+		$value = $unique ? sprintf('seed_%d_%s', $seq, $random) : $random;
+		return substr($value, 0, $maxLen);
+	}
+
+	private function parseLength(string $type): int {
+		if (preg_match('/\\((\\d+)\\)/', $type, $m)) return (int)$m[1];
+		return 16;
 	}
 
 	private function firstEnumValue(string $type): string {
