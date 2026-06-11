@@ -3,7 +3,8 @@
 $args = array_slice($argv, 1);
 $cmd = $args[0] ?? '';
 
-if ($cmd === '' || $cmd === 'help') {
+$helpFlags = ['', 'help', '-h', '--help'];
+if (in_array($cmd, $helpFlags, true)) {
 	fwrite(STDERR, "usage: seed.php <command> [args...]\n  list\n  build <type> <count> [key=value ...]\n");
 	exit($cmd === '' ? 1 : 0);
 }
