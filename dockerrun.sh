@@ -81,4 +81,14 @@ service apache2 start
 
 sudo -u www-data php /usr/local/aspen-discovery/docker/files/cron/checkBackgroundProcessesDocker.php "${SITENAME}" || true
 
+cat <<EOF
+
+========================================
+  Aspen dev box ready
+  URL:  http://localhost:${ASPEN_PORT:-8083}
+  Site: ${SITENAME}
+========================================
+
+EOF
+
 /bin/bash -c "trap : TERM INT; sleep infinity & wait"

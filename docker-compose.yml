@@ -36,6 +36,7 @@ services:
 
   solr:
     image: aspendiscovery/solr:latest
+    attach: false
     environment:
       - SOLR_PORT=8084
       - SOLR_HOST=solr
