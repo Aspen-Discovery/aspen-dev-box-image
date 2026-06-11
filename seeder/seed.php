@@ -5,7 +5,7 @@ $cmd = $args[0] ?? '';
 
 $helpFlags = ['', 'help', '-h', '--help'];
 if (in_array($cmd, $helpFlags, true)) {
-	fwrite(STDERR, "usage: seed.php <command> [args...]\n  list\n  build <type> <count> [key=value ...]\n");
+	fwrite(STDERR, "usage: seed.php <command> [args...]\n  list\n  build <table> <count> [key=value ...]\n");
 	exit($cmd === '' ? 1 : 0);
 }
 
@@ -14,20 +14,26 @@ $_SERVER['aspen_server'] = getenv('SITE_NAME') ?: 'dev.localhost';
 chdir('/usr/local/aspen-discovery/code/web');
 require_once '/usr/local/aspen-discovery/code/web/bootstrap.php';
 require_once __DIR__ . '/lib/BaseType.php';
+require_once __DIR__ . '/lib/GenericType.php';
 
 foreach (glob(__DIR__ . '/types/*.php') as $file) {
 	require_once $file;
 }
 
-$types = [];
+$customTypes = [];
 foreach (get_declared_classes() as $class) {
 	if (!is_subclass_of($class, 'BaseType')) continue;
+	if ($class === 'GenericType') continue;
 	$instance = new $class();
-	$types[$instance->name()] = $instance;
+	$customTypes[$instance->name()] = $instance;
 }
 
 if ($cmd === 'list') {
-	foreach (array_keys($types) as $name) echo "$name\n";
+	$tables = listTables();
+	foreach ($tables as $table) {
+		$marker = isset($customTypes[$table]) ? ' [custom]' : '';
+		echo "$table$marker\n";
+	}
 	exit(0);
 }
 
@@ -36,11 +42,11 @@ if ($cmd !== 'build') {
 	exit(1);
 }
 
-$type = $args[1] ?? '';
+$target = $args[1] ?? '';
 $count = (int)($args[2] ?? 0);
 
-if (!isset($types[$type])) {
-	fwrite(STDERR, "unknown type: $type (try 'list')\n");
+if ($target === '') {
+	fwrite(STDERR, "build requires a table or type name\n");
 	exit(1);
 }
 
@@ -56,5 +62,26 @@ foreach (array_slice($args, 3) as $kv) {
 	$overrides[$k] = $v;
 }
 
-$created = $types[$type]->build($count, $overrides);
-echo "built $created of $count requested $type\n";
+$type = $customTypes[$target] ?? (tableExists($target) ? new GenericType($target) : null);
+
+if ($type === null) {
+	fwrite(STDERR, "unknown table or type: $target (try 'list')\n");
+	exit(1);
+}
+
+$created = $type->build($count, $overrides);
+echo "built $created of $count requested $target\n";
+
+function listTables(): array {
+	global $aspen_db;
+	$stmt = $aspen_db->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME");
+	$rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
+	return $rows;
+}
+
+function tableExists(string $name): bool {
+	global $aspen_db;
+	$stmt = $aspen_db->prepare("SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :t");
+	$stmt->execute([':t' => $name]);
+	return (bool)$stmt->fetchColumn();
+}
