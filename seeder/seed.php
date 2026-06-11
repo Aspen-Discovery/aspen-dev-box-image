@@ -9,6 +9,8 @@ if (in_array($cmd, $helpFlags, true)) {
 	exit($cmd === '' ? 1 : 0);
 }
 
+$_SERVER['aspen_server'] = getenv('SITE_NAME') ?: 'dev.localhost';
+
 chdir('/usr/local/aspen-discovery/code/web');
 require_once '/usr/local/aspen-discovery/code/web/bootstrap.php';
 require_once __DIR__ . '/lib/BaseType.php';
