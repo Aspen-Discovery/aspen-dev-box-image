@@ -9,6 +9,7 @@ services:
       - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
       - "$ASPEN_CLONE:/usr/local/aspen-discovery"
       - "$ASPEN_DOCKER/aliases:/var/www/.bashrc"
+      - "$ASPEN_DOCKER/seeder:/seeder:ro"
     ports:
       - "${ASPEN_PORT:-8083}:80"
     networks:
