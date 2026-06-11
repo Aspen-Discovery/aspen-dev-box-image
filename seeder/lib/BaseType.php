@@ -15,8 +15,9 @@ abstract class BaseType {
 		$start = $this->nextIndex();
 		$created = 0;
 		for ($i = 0; $i < $count; $i++) {
-			$row = array_merge($this->identity($start + $i), $overrides);
-			$id = $builder->build($this->table(), $row);
+			$n = $start + $i;
+			$row = array_merge($this->identity($n), $overrides);
+			$id = $builder->build($this->table(), $row, $n);
 			if ($id === false) break;
 			$created++;
 		}
