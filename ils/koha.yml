@@ -21,6 +21,7 @@ account_profile:
 indexing_profile:
   name: ils
   indexingClass: Koha
+  runFullUpdate: 1
   marcEncoding: UTF8
   catalogDriver: Koha
   marcPath: /data/aspen-discovery/${SITE_NAME}/ils/marc
