@@ -1,0 +1,52 @@
+driver: Koha
+
+account_profile:
+  id: 2
+  name: ils
+  driver: Koha
+  loginConfiguration: barcode_pin
+  authenticationMethod: ils
+  vendorOpacUrl: http://${KOHA_STACK}-koha-1:8080
+  patronApiUrl: http://${KOHA_STACK}-koha-1:8080
+  recordSource: ils
+  weight: 1
+  databaseHost: ${KOHA_STACK}-db-1
+  databaseName: koha_kohadev
+  databaseUser: koha_kohadev
+  databasePassword: password
+  databasePort: 3306
+  databaseTimezone: GMT
+  ils: koha
+
+indexing_profile:
+  name: ils
+  indexingClass: Koha
+  marcEncoding: UTF8
+  catalogDriver: Koha
+  marcPath: /data/aspen-discovery/${SITE_NAME}/ils/marc
+  recordUrlComponent: Record
+  formatSource: item
+  recordNumberTag: '999'
+  itemTag: '952'
+  itemRecordNumber: '9'
+  useItemBasedCallNumbers: 1
+  callNumber: o
+  location: a
+  shelvingLocation: c
+  collection: '8'
+  volume: h
+  barcode: p
+  totalCheckouts: l
+  totalRenewals: m
+  iType: y
+  dueDate: k
+  dateCreated: d
+  dateCreatedFormat: yyyy-MM-dd
+  format: y
+  filenamesToInclude: '.*\\.ma?rc'
+  doAutomaticEcontentSuppression: 1
+  recordNumberSubfield: c
+  noteSubfield: z
+  lastCheckinFormat: ''
+
+extras_sql: ils/extras/koha.sql
