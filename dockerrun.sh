@@ -44,6 +44,15 @@ fi
 echo "syncing env vars..."
 php syncEnvToConfig.php || true
 
+if ! grep -q "^\[Plugins\]" "${CONFIG_DIRECTORY}/conf/config.ini"; then
+    cat >> "${CONFIG_DIRECTORY}/conf/config.ini" <<'EOF'
+
+[Plugins]
+enabled = 1
+path = /plugins
+EOF
+fi
+
 echo "Initializing database..."
 php initDatabase.php
 
