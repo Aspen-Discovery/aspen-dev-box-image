@@ -2,6 +2,10 @@
 #
 
 set -e
+if [ ! -x /usr/local/bin/composer ]; then
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+fi
+cd /usr/local/aspen-discovery/code/web && /usr/local/bin/composer install --no-interaction --prefer-dist
 
 SITENAME="${SITE_NAME:-test.localhostaspen}"
 LOCAL_USER_ID="${LOCAL_USER_ID:-501}"
