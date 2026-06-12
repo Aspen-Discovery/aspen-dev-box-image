@@ -44,7 +44,7 @@ fi
 echo "syncing env vars..."
 php syncEnvToConfig.php || true
 
-if ! grep -q "^\[Plugins\]" "${CONFIG_DIRECTORY}/conf/config.ini"; then
+if [ "${ASPEN_PLUGINS_ENABLED:-0}" = "1" ]; then
     cat >> "${CONFIG_DIRECTORY}/conf/config.ini" <<'EOF'
 
 [Plugins]
