@@ -2,10 +2,9 @@
 #
 
 set -e
-if [ ! -x /usr/local/bin/composer ]; then
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-fi
-cd /usr/local/aspen-discovery/code/web && /usr/local/bin/composer install --no-interaction --prefer-dist
+source /container_setup.sh
+
+ensure_composer
 
 SITENAME="${SITE_NAME:-test.localhostaspen}"
 LOCAL_USER_ID="${LOCAL_USER_ID:-501}"
@@ -16,9 +15,8 @@ echo "Configuring container users to match host (UID=${LOCAL_USER_ID}, GID=${LOC
 
 # Remap www-data group GID — PHP-FPM (group=www-data) and Apache (APACHE_RUN_GROUP)
 # resolve this group name at runtime, so it must carry the host GID.
-groupmod -o -g "${LOCAL_GROUP_ID}" www-data
+remap_www_data
 getent group aspen_apache > /dev/null 2>&1 || groupadd -o -g "${LOCAL_GROUP_ID}" aspen_apache
-usermod -o -u "${LOCAL_USER_ID}" -s /bin/bash www-data
 usermod -a -G aspen_apache,sudo www-data
 
 if ! id aspen > /dev/null 2>&1; then
@@ -36,16 +34,10 @@ fi
 echo "www-data ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/www-data
 
 export CONFIG_DIRECTORY="/usr/local/aspen-discovery/sites/${SITENAME}"
-mkdir -p $CONFIG_DIRECTORY 2>/dev/null
+create_site_config "${CONFIG_DIRECTORY}"
 
 cd /usr/local/aspen-discovery/docker/files/scripts
 
-if [ ! -f "${CONFIG_DIRECTORY}/conf/config.ini" ]; then
-    echo "Creating site configuration for ${SITENAME}..."
-    php createConfig.php "${CONFIG_DIRECTORY}"
-else
-    echo "Site configuration exists..."
-fi 
 echo "syncing env vars..."
 php syncEnvToConfig.php || true
 
