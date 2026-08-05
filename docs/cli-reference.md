@@ -29,6 +29,7 @@ Bring up the Docker Compose project.
 |------|-------------|
 | `-d, --detached` | Run in detached mode |
 | `-g, --debugging` | Include the Xdebug overlay ([Debugging](debugging.md)) |
+| `-j, --java-debug` | Expose JDWP port 5005 and mount `debug.sh` for Java debugging |
 | `-b, --dbgui` | Include phpMyAdmin on localhost:8085 |
 | `-p, --pull` | Pull registry images before starting |
 | `-i, --ils` | ILS preset name, path to a YAML config, or `none` (default: `koha`) |

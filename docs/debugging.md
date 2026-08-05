@@ -92,12 +92,11 @@ XDEBUG_MODE=debug XDEBUG_CONFIG="client_host=host.docker.internal" \
 ## Java debugging (JDWP)
 
 The Java background jobs can be debugged with a remote JDWP attach on port
-5005. This uses a separate overlay that is not wired into `adb`; include it
-manually when starting the stack:
+5005. Start the stack with the Java debug overlay (combines freely with the
+other flags, e.g. `-g`):
 
 ```shell
-cd $ASPEN_DOCKER
-docker compose -f compose/docker-compose.yml -f compose/docker-compose.debug.java.yml up -d
+adb up -d -j
 ```
 
 Then, from a shell in the container (`adb shell`), start the job you want to
@@ -115,3 +114,5 @@ before running. Supported projects: `koha_export`, `oai_indexer`,
 
 The shipped `vscodedebugconfig.json` includes a matching
 **"Debug Java in Docker"** attach configuration for `localhost:5005`.
+`vscodetasksconfig.json` provides a "Run Debug Script" task that runs
+`debug.sh` in the container.
