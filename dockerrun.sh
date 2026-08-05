@@ -10,6 +10,7 @@ cd /usr/local/aspen-discovery/code/web && /usr/local/bin/composer install --no-i
 SITENAME="${SITE_NAME:-test.localhostaspen}"
 LOCAL_USER_ID="${LOCAL_USER_ID:-501}"
 LOCAL_GROUP_ID="${LOCAL_GROUP_ID:-20}"
+PHP_VERSION=$(php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;')
 
 echo "Configuring container users to match host (UID=${LOCAL_USER_ID}, GID=${LOCAL_GROUP_ID})..."
 
@@ -69,7 +70,7 @@ chown -R www-data:www-data /usr/local/aspen-discovery/tmp /var/log/aspen-discove
 chown -R www-data:www-data "${CONFIG_DIRECTORY}"
 chown -R aspen:www-data /var/run/aspen
 cp "${CONFIG_DIRECTORY}/httpd-${SITENAME}.conf" /etc/apache2/sites-enabled/
-cp "${CONFIG_DIRECTORY}/conf/php-fpm.conf" /etc/php/8.4/fpm/pool.d/
+cp "${CONFIG_DIRECTORY}/conf/php-fpm.conf" "/etc/php/${PHP_VERSION}/fpm/pool.d/"
 
 echo "Running pending database updates..."
 php updateDatabase.php "${SITENAME}"
@@ -78,7 +79,7 @@ crontab "${CONFIG_DIRECTORY}/conf/crontab"
 service cron start
 
 echo "Starting PHP-FPM..."
-php-fpm8.4 &
+"php-fpm${PHP_VERSION}" &
 
 echo "Waiting for PHP-FPM to be ready on port 9000..."
 for i in {1..10}; do
