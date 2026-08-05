@@ -112,39 +112,16 @@ adb tests --filter DateUtilsTests
 Run an Aspen background job inside the main container. Jobs are invoked with
 the site name. Any extra arguments are passed through.
 
+Jar jobs are discovered from your aspen clone: any module under `code/` with
+a built `<module>.jar` can be run using its module name (`reindexer`,
+`koha_export`, `oai_indexer`, ...). Two PHP jobs are always available: `cron`
+(background process check) and `sitemaps` (sitemap creation).
+
 ```shell
-adb run list                  # list available jobs
+adb run list                  # list the jobs available in your clone
 adb run reindexer
-adb run koha-export
+adb run koha_export
 ```
-
-Available jobs:
-
-| Job | Runs |
-|-----|------|
-| `reindexer` | Grouped work reindexer |
-| `oai-indexer` | OAI indexer |
-| `web-indexer` | Website indexer |
-| `events-indexer` | Events indexer |
-| `series-indexer` | Series indexer |
-| `course-reserves` | Course reserves indexer |
-| `user-lists` | User list indexer |
-| `sideload` | Sideload processing |
-| `marc-merge` | MARC merge utility |
-| `koha-export` | Koha export |
-| `evergreen-export` | Evergreen export |
-| `polaris-export` | Polaris export |
-| `sierra-export` | Sierra export API |
-| `carlx-export` | CarlX export |
-| `symphony-export` | Symphony export |
-| `evolve-export` | Evolve export |
-| `hoopla-export` | Hoopla export |
-| `overdrive-export` | OverDrive extract |
-| `cloud-library-export` | Cloud Library export |
-| `palace-project-export` | Palace Project export |
-| `cron-jar` | Cron JAR |
-| `cron` | PHP background process check |
-| `sitemaps` | PHP sitemap creation |
 
 ### `adb seed <command> [args...]`
 
