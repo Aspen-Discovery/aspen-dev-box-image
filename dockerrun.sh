@@ -78,6 +78,19 @@ php updateDatabase.php "${SITENAME}"
 crontab "${CONFIG_DIRECTORY}/conf/crontab"
 service cron start
 
+if [ -f /aspen-dev-conf/xdebug.ini ]; then
+    if php -r 'exit(file_exists(ini_get("extension_dir") . "/xdebug.so") ? 0 : 1);'; then
+        phpenmod xdebug
+        ln -sf /aspen-dev-conf/xdebug.ini "/etc/php/${PHP_VERSION}/fpm/conf.d/99-xdebug.ini"
+    else
+        echo "WARNING: xdebug extension not present in this image, step debugging disabled"
+    fi
+fi
+
+if [ -f /aspen-dev-conf/error_reporting.ini ]; then
+    ln -sf /aspen-dev-conf/error_reporting.ini "/etc/php/${PHP_VERSION}/fpm/conf.d/error_reporting.ini"
+fi
+
 echo "Starting PHP-FPM..."
 "php-fpm${PHP_VERSION}" &
 
