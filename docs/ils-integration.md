@@ -48,19 +48,17 @@ adb oauth <client_id> <client_secret> [-d Driver] [-p]
 
 ## Evergreen
 
-An Evergreen stack is available as a compose overlay,
-`compose/docker-compose.evergreen.yml`. It is not currently wired into an `--ils`
-preset; start it manually alongside the base compose file:
+An Evergreen ILS stack ships as a preset:
 
 ```shell
-cd $ASPEN_DOCKER
-docker compose -f compose/docker-compose.yml -f compose/docker-compose.evergreen.yml up -d
+adb up --ils evergreen
 ```
 
-The overlay runs an Evergreen ILS container on a shared `evergreen-net`
-network. It seeds Aspen's Evergreen account and indexing profiles via
-`database_start_scripts/evergreen/` and mounts `export_utils/` into the main
-container for export experiments. Pull its image with `adb pull -e`.
+This adds `compose/docker-compose.evergreen.yml`, which runs an Evergreen ILS
+container (`mobiusoffice/evergreen-ils`, pull it with `adb pull -e`) on a
+shared `evergreen-net` network and seeds Aspen's Evergreen account and
+indexing profiles from `ils/evergreen.yml`. `export_utils/` is mounted into
+both containers for export experiments.
 
 ## Custom ILS configs
 
@@ -72,9 +70,9 @@ outside this repository:
 adb up --ils ~/configs/my-koha.yml
 ```
 
-Preset names resolve to `ils/<name>.yml` in this repository. `koha` is the
-shipped preset; names starting with `_` are reserved for shared base configs
-and cannot be used directly.
+Preset names resolve to `ils/<name>.yml` in this repository. `koha` and
+`evergreen` are the shipped presets; names starting with `_` are reserved for
+shared base configs and cannot be used directly.
 
 A config file looks like this (trimmed from `ils/koha.yml`):
 

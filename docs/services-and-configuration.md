@@ -27,7 +27,7 @@ selects them by flag:
 | `compose/docker-compose.ils.yml` | any `--ils` config | Applies the generated ILS setup SQL |
 | `compose/docker-compose.koha.yml` | `--ils koha` | Joins the koha-testing-docker network, OAuth provisioning |
 | `compose/docker-compose.plugins.yml` | `--plugins` | Plugin dir mount |
-| `compose/docker-compose.evergreen.yml` | manual `-f` | Evergreen ILS stack |
+| `compose/docker-compose.evergreen.yml` | `--ils evergreen` | Evergreen ILS stack |
 | `compose/docker-compose.debug.java.yml` | manual `-f` | JDWP port for Java debugging |
 
 ## `.env` reference

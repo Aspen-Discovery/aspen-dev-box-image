@@ -40,6 +40,7 @@ Bring up the Docker Compose project.
 adb up -d                     # detached, default Koha integration
 adb up -d -g                  # with PHP debugging
 adb up --ils none             # standalone Aspen, no ILS
+adb up --ils evergreen        # Evergreen instead of Koha
 adb up -i /path/to/custom.yml # custom ILS config
 adb up -k my-koha-stack       # proxied koha-testing-docker stack
 ```
