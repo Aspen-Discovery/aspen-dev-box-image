@@ -89,6 +89,24 @@ Open an interactive MariaDB shell connected to the Aspen database.
 Run any pending Aspen database updates via the SystemAPI and print the results,
 including any failed SQL.
 
+### `adb tests [phpunit args...]`
+
+Run the Aspen phpunit suite in a separate container against its own database
+(`aspen_unit_tests`). The dev database, site config and running containers
+are not touched, but the stack must already be up (`adb up -d`). Extra
+arguments are passed through to phpunit.
+
+The suite drops and reimports the test database at the start of every run
+(the base `install/aspen.sql` schema plus the test data in
+`tests/unit_tests.sql`), so every run starts from the same state. Pending
+database updates are not applied, the schema is whatever aspen.sql contains
+in your clone.
+
+```shell
+adb tests
+adb tests --filter DateUtilsTests
+```
+
 ### `adb run <job> [extra args...]`
 
 Run an Aspen background job inside the main container. Jobs are invoked with

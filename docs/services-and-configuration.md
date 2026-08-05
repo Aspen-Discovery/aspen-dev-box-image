@@ -29,6 +29,7 @@ selects them by flag:
 | `compose/docker-compose.plugins.yml` | `--plugins` | Plugin dir mount |
 | `compose/docker-compose.evergreen.yml` | `--ils evergreen` | Evergreen ILS stack |
 | `compose/docker-compose.debug.java.yml` | `adb up -j` | JDWP port for Java debugging |
+| `compose/docker-compose.tests.yml` | `adb tests` | Throwaway phpunit runner with its own database |
 
 ## `.env` reference
 
