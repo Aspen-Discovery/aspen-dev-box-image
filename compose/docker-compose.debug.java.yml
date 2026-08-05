@@ -2,8 +2,6 @@ services:
   aspen-dev-box:
     ports:
       - "5005:5005"
-    environment:
-      - SITE_NAME=test.localhostaspen
     volumes:
       - "$ASPEN_DOCKER/debug.sh:/debug.sh"
 
