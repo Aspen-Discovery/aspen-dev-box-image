@@ -4,13 +4,7 @@
     {
       "label": "Run Debug Script",
       "type": "shell",
-      "command": "docker",
-      "args": [
-        "exec",
-        "containeraspen",
-        "/debug.sh",
-        "${input:projectArg}"
-      ],
+      "command": "docker exec $(docker ps -q --filter name=aspen-dev-box-1) /debug.sh ${input:projectArg}",
       "problemMatcher": []
     }
   ],
