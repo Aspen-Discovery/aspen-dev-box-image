@@ -17,18 +17,18 @@ the next `adb up` re-initialises from `aspen.sql` plus any ILS setup SQL.
 
 ## Compose overlays
 
-`docker-compose.yml` defines the core stack; overlays add features. `adb`
+`compose/docker-compose.yml` defines the core stack; overlays add features. `adb`
 selects them by flag:
 
 | File | Added by | Purpose |
 |------|----------|---------|
-| `docker-compose.debug.yml` | `adb up -g` | Xdebug config for PHP step debugging |
-| `docker-compose.dbgui.yml` | `adb up -b` | phpMyAdmin |
-| `docker-compose.ils.yml` | any `--ils` config | Applies the generated ILS setup SQL |
-| `docker-compose.koha.yml` | `--ils koha` | Joins the koha-testing-docker network, OAuth provisioning |
-| `docker-compose.plugins.yml` | `--plugins` | Plugin dir mount |
-| `docker-compose.evergreen.yml` | manual `-f` | Evergreen ILS stack |
-| `docker-compose.debug.java.yml` | manual `-f` | JDWP port for Java debugging |
+| `compose/docker-compose.debug.yml` | `adb up -g` | Xdebug config for PHP step debugging |
+| `compose/docker-compose.dbgui.yml` | `adb up -b` | phpMyAdmin |
+| `compose/docker-compose.ils.yml` | any `--ils` config | Applies the generated ILS setup SQL |
+| `compose/docker-compose.koha.yml` | `--ils koha` | Joins the koha-testing-docker network, OAuth provisioning |
+| `compose/docker-compose.plugins.yml` | `--plugins` | Plugin dir mount |
+| `compose/docker-compose.evergreen.yml` | manual `-f` | Evergreen ILS stack |
+| `compose/docker-compose.debug.java.yml` | manual `-f` | JDWP port for Java debugging |
 
 ## `.env` reference
 

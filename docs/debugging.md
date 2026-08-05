@@ -10,7 +10,7 @@ adb up -d -g
 
 ### How it works
 
-The overlay (`docker-compose.debug.yml`) mounts `xdebug.ini` and
+The overlay (`compose/docker-compose.debug.yml`) mounts `xdebug.ini` and
 `error_reporting.ini` from this repository into the container at
 `/aspen-dev-conf/`. On startup the entrypoint detects the container's PHP
 version and, when the Xdebug extension is present in the image, links the
@@ -97,7 +97,7 @@ manually when starting the stack:
 
 ```shell
 cd $ASPEN_DOCKER
-docker compose -f docker-compose.yml -f docker-compose.debug.java.yml up -d
+docker compose -f compose/docker-compose.yml -f compose/docker-compose.debug.java.yml up -d
 ```
 
 Then, from a shell in the container (`adb shell`), start the job you want to

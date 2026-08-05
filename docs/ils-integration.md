@@ -49,12 +49,12 @@ adb oauth <client_id> <client_secret> [-d Driver] [-p]
 ## Evergreen
 
 An Evergreen stack is available as a compose overlay,
-`docker-compose.evergreen.yml`. It is not currently wired into an `--ils`
+`compose/docker-compose.evergreen.yml`. It is not currently wired into an `--ils`
 preset; start it manually alongside the base compose file:
 
 ```shell
 cd $ASPEN_DOCKER
-docker compose -f docker-compose.yml -f docker-compose.evergreen.yml up -d
+docker compose -f compose/docker-compose.yml -f compose/docker-compose.evergreen.yml up -d
 ```
 
 The overlay runs an Evergreen ILS container on a shared `evergreen-net`

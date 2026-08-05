@@ -10,7 +10,7 @@ adb up --plugins --plugins-path ~/my-aspen-plugins
 
 ## How it works
 
-The plugins overlay (`docker-compose.plugins.yml`) bind-mounts your plugins
+The plugins overlay (`compose/docker-compose.plugins.yml`) bind-mounts your plugins
 directory at `/plugins` inside the main container and sets
 `ASPEN_PLUGINS_ENABLED=1`. On startup the entrypoint then appends to the site
 `config.ini`:
