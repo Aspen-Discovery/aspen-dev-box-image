@@ -27,7 +27,11 @@ adb up -d
 ```
 
 - [localhost:8083](http://localhost:8083) — the Aspen Discovery interface
-- [localhost:8084](http://localhost:8084) — the Solr dashboard
+- [localhost:8084](http://localhost:8084) — the Solr dashboard (with `--no-proxy`)
+
+Behind the scenes this runs through the aspen proxy, so additional instances
+(e.g. [git worktrees](docs/proxy.md) of your clone) are served side by side on
+`http://<name>.localhost:8083` with no port juggling.
 
 **Note:** by default `adb up` connects to a running
 [koha-testing-docker](https://gitlab.com/koha-community/koha-testing-docker)
@@ -54,5 +58,5 @@ Database: aspen
 - [Debugging](docs/debugging.md) — PHP step debugging with Xdebug, Java debugging
 - [ILS Integration](docs/ils-integration.md) — Koha, Evergreen and custom ILS configs
 - [Plugins](docs/plugins.md) — developing Aspen plugins against the dev box
-- [Shared Proxy](docs/proxy.md) — hostname routing for multiple side-by-side stacks
+- [Aspen Proxy](docs/proxy.md) — hostname routing for multiple side-by-side stacks
 - [Services & Configuration](docs/services-and-configuration.md) — containers, compose overlays, `.env` reference

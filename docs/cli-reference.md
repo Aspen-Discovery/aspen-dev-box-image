@@ -16,14 +16,31 @@ The CLI needs two environment variables (see
 - `ASPEN_CLONE` — path to your aspen-discovery clone
 
 The docker compose project ("stack") name is resolved in this order:
-`--stack` flag, `COMPOSE_PROJECT_NAME`, then the basename of
+`--stack` flag, `ASPEN_STACK`, `COMPOSE_PROJECT_NAME`, then the basename of
 `$ASPEN_DOCKER`. Container names follow `<stack>-<service>-1`.
+
+`-w, --worktree <name>` targets a [git worktree](https://git-scm.com/docs/git-worktree)
+of `$ASPEN_CLONE` instead of the main checkout, matched by directory or
+branch name from `git worktree list`. Its checkout becomes `ASPEN_CLONE` and
+its (sanitised) directory name becomes the stack, so every command (`up`,
+`logs`, `shell`, ...) operates on that instance:
+
+```shell
+git -C $ASPEN_CLONE worktree add ../aspen-my-feature my-feature
+adb -w aspen-my-feature up -d       # or -w my-feature (branch name)
+adb -w aspen-my-feature logs -f
+adb -w aspen-my-feature down
+```
 
 ## Stack lifecycle
 
 ### `adb up`
 
-Bring up the Docker Compose project.
+Bring up the Docker Compose project, routed through the aspen proxy
+([Aspen Proxy](proxy.md)) — started automatically if it isn't running. The
+default instance is served on [localhost:8083](http://localhost:8083) as
+always; worktrees and named stacks get `http://<stack>.localhost:8083`.
+`--no-proxy` binds host ports directly instead.
 
 | Flag | Description |
 |------|-------------|
@@ -36,6 +53,8 @@ Bring up the Docker Compose project.
 | `-k, --koha-stack` | koha-testing-docker stack to connect to (default: `kohadev`) |
 | `--plugins` | Mount a plugins dir and enable Aspen plugin loading ([Plugins](plugins.md)) |
 | `--plugins-path` | Host path of the plugins dir (default: `$ASPEN_PLUGINS` or `$ASPEN_DOCKER/plugins`) |
+| `--no-proxy` | Bind host ports directly instead of routing through the proxy |
+| `--host` | Hostname to serve when proxied (default: `localhost` for the default instance, else `<stack>.localhost`) |
 
 ```shell
 adb up -d                     # detached, default Koha integration
@@ -44,11 +63,32 @@ adb up --ils none             # standalone Aspen, no ILS
 adb up --ils evergreen        # Evergreen instead of Koha
 adb up -i /path/to/custom.yml # custom ILS config
 adb up -k my-koha-stack       # proxied koha-testing-docker stack
+adb up -d --no-proxy          # old-style host ports, no proxy involved
 ```
 
 ### `adb down`
 
-Stop and remove the project's containers, including orphans.
+Stop and remove the project’s containers, volumes (the db state does not
+survive a down anyway) and generated ILS SQL. The aspen proxy
+is stopped along with the last proxied stack.
+
+| Flag | Description |
+|------|-------------|
+| `--all` | Bring down every aspen stack (any worktree or stack name) and the proxy |
+
+### `adb proxy`
+
+Manually start or stop the aspen traefik proxy that routes every proxied
+aspen stack by hostname on the external `aspen-proxy` network
+([Aspen Proxy](proxy.md)) — usually unnecessary, since `adb up`/`adb down`
+manage it. It is fully independent of koha-testing-docker's proxy. The
+dashboard is served on
+[aspen-proxy.localhost:8083](http://aspen-proxy.localhost:8083).
+
+```shell
+adb proxy up
+adb proxy down
+```
 
 ### `adb pull`
 

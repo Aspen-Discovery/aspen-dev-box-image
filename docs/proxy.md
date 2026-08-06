@@ -1,17 +1,14 @@
 # Aspen Proxy
 
-Running more than one Aspen stack at once means finding a free set of host
-ports for each one. The aspen proxy replaces per-stack port bindings with
-hostname routing: every stack attaches to one external Docker network
-(`aspen-proxy`) and a single Traefik instance routes `<name>.localhost`
+The aspen proxy replaces per-stack port bindings with
+a hostname routing container: every stack attaches to one external Docker network
+(`aspen-proxy`) and a Traefik instance routes `<name>.localhost`
 hostnames to the right container.
 
 It is separate from koha-testing-docker's proxy (`KTD_PROXY=yes`):
 
 - The aspen traefik only routes containers labelled `aspen.proxy=true`
-  (enforced with a provider constraint), so it never picks up Koha stacks.
-- Aspen containers never set `traefik.enable=true`, so KTD's traefik never
-  picks up Aspen stacks.
+  (enforced with a provider constraint), so it only picks up the correct containers.
 - Both proxies run side by side: the aspen proxy defaults to aspen's usual
   port 8083 (8443 for TLS), leaving 80/443 to KTD's. Override with
   `PROXY_HTTP_PORT` / `PROXY_HTTPS_PORT`; `adb` detects the published port
@@ -25,8 +22,7 @@ running and `adb down` stops it along with the last proxied stack
 control:
 
 ```shell
-docker network create aspen-proxy   # once
-docker compose -f proxy/docker-compose.yml -p aspen-proxy up -d
+adb proxy up
 ```
 
 The Traefik dashboard is served at
@@ -39,7 +35,7 @@ the host port bindings, joins the `aspen-proxy` network and labels the web
 container for Traefik. It needs two env vars and accepts two more:
 
 | Variable | Required | Purpose |
-|----------|----------|---------|
+| ---------- | ---------- | --------- |
 | `ASPEN_STACK` | yes | compose project name; namespaces the Traefik router (`aspen-<stack>`) |
 | `ASPEN_HOST` | yes | hostname to serve, e.g. `mybranch.localhost` |
 | `ASPEN_URL` | no | full base URL (default `http://<ASPEN_HOST>`) |
@@ -49,15 +45,25 @@ container for Traefik. It needs two env vars and accepts two more:
 `SITE_NAME` and `URL` inside the container are derived from `ASPEN_HOST` and
 `ASPEN_URL`, so they do not need to be set separately.
 
+`adb up` handles all of this: when the aspen proxy is running the
+overlay is layered in automatically and the stack is served on
+`http://<stack>.localhost:port` with the default being 8083 for the aspen container, 8084 for solr;
+when the proxy isn't running it falls back to host ports. `--no-proxy` forces
+host ports, `--host` overrides the hostname.
+
 ```shell
-ASPEN_STACK=mybranch ASPEN_HOST=mybranch.localhost \
-docker compose -p mybranch \
-  -f compose/docker-compose.yml \
-  -f compose/docker-compose.proxy.yml \
-  up -d
+adb up -d
 ```
 
-`*.localhost` names resolve to loopback, so the instance URLs need no DNS
+Combined with git worktrees of the aspen clone (`adb -w`) this gives one URL
+per branch:
+
+```shell
+git -C $ASPEN_CLONE worktree add ../aspen-my-feature my-feature
+adb -w my-feature up -d           # http://aspen-my-feature.localhost:8083
+```
+
+`localhost` names resolve to loopback, so the instance URLs need no DNS
 or `/etc/hosts` changes.
 
 ## Library subdomains
@@ -66,10 +72,7 @@ The router matches the instance host and any subdomain of it, so an aspen
 instance serving several libraries on subdomains works through the proxy:
 `lib1.mybranch.localhost` and `lib2.mybranch.localhost` reach the same
 container and aspen selects the interface from the Host header. Locally this
-needs no setup: nested `*.localhost` names also resolve to loopback. On a
-real domain a DNS wildcard only covers one label, so
-`lib1.<name>.sandboxes.example.com` needs a `*.<name>` record or a broader
-wildcard.
+functionality needs no additional setup.
 
 ## Linking each Aspen to its own Koha
 
