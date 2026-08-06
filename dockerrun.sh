@@ -41,7 +41,7 @@ cd /usr/local/aspen-discovery/docker/files/scripts
 echo "syncing env vars..."
 php syncEnvToConfig.php || true
 
-if [ "${ASPEN_PLUGINS_ENABLED:-0}" = "1" ]; then
+if [ "${ASPEN_PLUGINS_ENABLED:-0}" = "1" ] && ! grep -q '^\[Plugins\]' "${CONFIG_DIRECTORY}/conf/config.ini"; then
     cat >> "${CONFIG_DIRECTORY}/conf/config.ini" <<'EOF'
 
 [Plugins]
