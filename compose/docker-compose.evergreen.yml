@@ -18,12 +18,12 @@ services:
     stdin_open: true
     tty: true
     ports:
-      - "80:80"
-      - "443:443"
-      - "210:210"
-      - "6001:6001"
-      - "32:22"
-      - "5433:5432"
+      - "${EVERGREEN_HTTP_PORT:-80}:80"
+      - "${EVERGREEN_HTTPS_PORT:-443}:443"
+      - "${EVERGREEN_SIP_PORT:-210}:210"
+      - "${EVERGREEN_WS_PORT:-6001}:6001"
+      - "${EVERGREEN_SSH_PORT:-32}:22"
+      - "${EVERGREEN_PSQL_PORT:-5433}:5432"
     hostname: app.evergreen.com
     image: mobiusoffice/evergreen-ils
     volumes:
