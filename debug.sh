@@ -33,6 +33,7 @@ fi
 
 appDir="/usr/local/aspen-discovery"
 path="$appDir/code/$name"
+binDir="/tmp/aspen-debug/$name"
 echo "Executing '$name' in path: $path"
 
 echo "=== CHANGING TO DIRECTORY: /usr/local/aspen-discovery/code/$name ==="
@@ -44,16 +45,17 @@ if [ ! -d "src" ]; then
 fi
 
 echo "=== COMPILING FOR DEBUGGING ==="
-mkdir -p bin && javac -cp "$(find $appDir -name '*.jar' | tr '\n' ':')" -d bin $(find src -name '*.java') $(find $appDir/code/java_shared_libraries -name '*.java')
+rm -rf "$binDir"
+mkdir -p "$binDir"
+classpath="$binDir:$(find "$appDir/code" -name '*.jar' | tr '\n' ':')"
+javac -cp "$classpath" -d "$binDir" $(find src -name '*.java') $(find $appDir/code/java_shared_libraries -name '*.java')
 
 echo "=== INITIALIZING DEBUGGING ==="
 echo "Waiting for VSC to connect to 5005 port..."
 echo "▶ Run debugger now (F5)"
 
 java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 \
-     -cp "bin:$(find $appDir -name '*.jar' | tr '\n' ':')" \
+     -cp "$classpath" \
      "${projects[$name]}" \
      "$SITE_NAME" \
      &
-
-rm -rf bin
