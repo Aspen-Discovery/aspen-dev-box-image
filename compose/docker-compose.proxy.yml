@@ -1,0 +1,33 @@
+services:
+  aspen-dev-box:
+    ports: !reset []
+    environment:
+      - SITE_NAME=${ASPEN_HOST}
+      - URL=${ASPEN_URL:-http://${ASPEN_HOST}}
+    volumes:
+      - aspen-site:/usr/local/aspen-discovery/sites/${ASPEN_HOST}
+    networks:
+      - aspen-net
+      - aspen-proxy
+    labels:
+      - "aspen.proxy=true"
+      - "traefik.docker.network=aspen-proxy"
+      - "traefik.http.routers.aspen-${ASPEN_STACK}.rule=Host(`${ASPEN_HOST}`) || HostRegexp(`^.+\\.${ASPEN_HOST}$$`)"
+      - "traefik.http.routers.aspen-${ASPEN_STACK}.entrypoints=${ASPEN_PROXY_ENTRYPOINT:-web}"
+      - "traefik.http.routers.aspen-${ASPEN_STACK}.tls=${ASPEN_PROXY_TLS:-false}"
+      - "traefik.http.services.aspen-${ASPEN_STACK}.loadbalancer.server.port=80"
+
+  solr:
+    ports: !reset []
+
+networks:
+  aspen-proxy:
+    name: aspen-proxy
+    external: true
+
+volumes:
+  aspen-site:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "uid=${UID:-501},gid=${GID:-20}"
