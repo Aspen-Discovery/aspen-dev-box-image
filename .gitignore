@@ -2,3 +2,5 @@
 local.yml
 .env
 .cache/
+/plugins/*
+!/plugins/.gitkeep
