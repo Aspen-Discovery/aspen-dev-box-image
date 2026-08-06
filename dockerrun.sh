@@ -104,7 +104,7 @@ cat <<EOF
 
 ========================================
   Aspen dev box ready
-  URL:  http://localhost:${ASPEN_PORT:-8083}
+  URL:  ${URL:-http://localhost:${ASPEN_PORT:-8083}}
   Site: ${SITENAME}
 ========================================
 
