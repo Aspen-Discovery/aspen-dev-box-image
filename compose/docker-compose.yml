@@ -37,15 +37,16 @@ services:
       - aspen-net
 
   solr:
-    image: aspendiscovery/solr:latest
+    image: ${SOLR_IMAGE:-solr:9}
     attach: false
     environment:
       - SOLR_PORT=8084
       - SOLR_HOST=solr
+      - SOLR_OPTS=-Dsolr.config.lib.enabled=true
     ports:
       - "${SOLR_HOST_PORT:-8084}:8084"
     volumes:
-      - $ASPEN_CLONE/data_dir_setup/solr7:/opt/solr/server/solr/configsets
+      - ${SOLR_CONFIGSETS:-$ASPEN_CLONE/data_dir_setup/solr7}:/opt/solr/server/solr/configsets
     deploy:
       endpoint_mode: dnsrr
     networks:
@@ -56,42 +57,15 @@ services:
       - /bin/bash
       - '-c'
       - |
+        set -e
         init-var-solr
-        # Series core
-        precreate-core series /opt/solr/server/solr/configsets/series
-        cp -r /opt/solr/server/solr/configsets/series/* series
-
-        # Genealogy core
-        precreate-core genealogy /opt/solr/server/solr/configsets/genealogy
-        cp -r /opt/solr/server/solr/configsets/genealogy/* genealogy
-
-        # Grouped Works v2 core
-        precreate-core grouped_works_v2 /opt/solr/server/solr/configsets/grouped_works_v2
-        cp -r /opt/solr/server/solr/configsets/grouped_works_v2/* grouped_works_v2
-
-        # Lists core
-        precreate-core lists /opt/solr/server/solr/configsets/lists
-        cp -r /opt/solr/server/solr/configsets/lists/* lists
-
-        # Course Reserves core
-        precreate-core course_reserves /opt/solr/server/solr/configsets/course_reserves
-        cp -r /opt/solr/server/solr/configsets/course_reserves/* course_reserves
-
-        # Open Archives core
-        precreate-core open_archives /opt/solr/server/solr/configsets/open_archives
-        cp -r /opt/solr/server/solr/configsets/open_archives/* open_archives
-
-        # Website Pages core
-        precreate-core website_pages /opt/solr/server/solr/configsets/website_pages
-        cp -r /opt/solr/server/solr/configsets/website_pages/* website_pages
-
-        # Events core
-        precreate-core events /opt/solr/server/solr/configsets/events
-        cp -r /opt/solr/server/solr/configsets/events/* events
-
-
-        chown -R solr:solr /var/solr
-        runuser -u solr -- solr-foreground
+        cd /var/solr/data
+        for core_dir in /opt/solr/server/solr/configsets/*/; do
+          core=$$(basename "$$core_dir")
+          precreate-core "$$core" "$$core_dir"
+          cp -r "$$core_dir"* "$$core/"
+        done
+        exec solr-foreground
 
 
 networks:
