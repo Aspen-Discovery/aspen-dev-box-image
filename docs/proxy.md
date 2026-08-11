@@ -30,7 +30,7 @@ The Traefik dashboard is served at
 
 ## Proxying an Aspen stack
 
-Layer `compose/docker-compose.proxy.yml` onto the base compose file. It drops
+Layer `compose/docker-compose.proxied-instance.yml` onto the base compose file. It drops
 the host port bindings, joins the `aspen-proxy` network and labels the web
 container for Traefik. It needs two env vars and accepts two more:
 
