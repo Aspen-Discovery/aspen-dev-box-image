@@ -19,6 +19,15 @@ services:
 
   solr:
     ports: !reset []
+    networks:
+      - aspen-net
+      - aspen-proxy
+    labels:
+      - "aspen.proxy=true"
+      - "traefik.docker.network=aspen-proxy"
+      - "traefik.http.routers.solr-${ASPEN_STACK}.rule=Host(`${ASPEN_HOST}`)"
+      - "traefik.http.routers.solr-${ASPEN_STACK}.entrypoints=solr"
+      - "traefik.http.services.solr-${ASPEN_STACK}.loadbalancer.server.port=8084"
 
 networks:
   aspen-proxy:
