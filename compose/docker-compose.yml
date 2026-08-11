@@ -53,6 +53,14 @@ services:
       - aspen-net
     depends_on:
       - aspen-dev-box
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -s --noproxy '*' 'http://localhost:8084/solr/admin/cores?action=STATUS&wt=json' | grep -qE '"initFailures":\{ *\}'
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     entrypoint:
       - /bin/bash
       - '-c'
