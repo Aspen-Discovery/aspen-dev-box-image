@@ -5,6 +5,15 @@ source /container_setup.sh
 
 SITENAME="unit_tests.localhost"
 
+PHPUNIT_ARGS=()
+for arg in "$@"; do
+    if [ "$arg" = "--updatedb" ]; then
+        export ASPEN_TESTS_RUN_DB_UPDATES=1
+        continue
+    fi
+    PHPUNIT_ARGS+=("$arg")
+done
+
 export SITE_NAME="${SITENAME}"
 export URL="http://${SITENAME}"
 export DATABASE_NAME="${TEST_DATABASE_NAME:-aspen_unit_tests}"
@@ -49,4 +58,4 @@ if [ "${SETUP_STATUS}" -ne 0 ]; then
 fi
 
 cd /usr/local/aspen-discovery/tests/phpunit
-exec runuser -u www-data -- php phpunit.phar --testdox "$@"
+exec runuser -u www-data -- php phpunit.phar --testdox "${PHPUNIT_ARGS[@]}"
