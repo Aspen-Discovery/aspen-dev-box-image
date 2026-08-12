@@ -46,9 +46,14 @@ container for Traefik. It needs two env vars and accepts two more:
 `SITE_NAME` and `URL` inside the container are derived from `ASPEN_HOST` and
 `ASPEN_URL`, so they do not need to be set separately.
 
+When the stack includes phpMyAdmin (`compose/docker-compose.dbgui.yml`), layer
+`compose/docker-compose.proxied-dbgui.yml` as well: it drops phpMyAdmin's host
+port and serves it on the instance hostname at port 8085.
+
 `adb up` handles all of this: when the aspen proxy is running the
 overlay is layered in automatically and the stack is served on
-`http://<stack>.localhost:port` with the default being 8083 for the aspen container, 8084 for solr;
+`http://<stack>.localhost:port` with the default being 8083 for the aspen
+container, 8084 for solr, 8085 for phpMyAdmin (with `-b`);
 when the proxy isn't running it falls back to host ports. `--no-proxy` forces
 host ports, `--host` overrides the hostname.
 

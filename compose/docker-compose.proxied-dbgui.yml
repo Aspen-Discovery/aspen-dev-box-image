@@ -1,0 +1,17 @@
+services:
+  phpmyadmin:
+    ports: !reset []
+    networks:
+      - aspen-net
+      - aspen-proxy
+    labels:
+      - "aspen.proxy=true"
+      - "traefik.docker.network=aspen-proxy"
+      - "traefik.http.routers.dbgui-${ASPEN_STACK}.rule=Host(`${ASPEN_HOST}`)"
+      - "traefik.http.routers.dbgui-${ASPEN_STACK}.entrypoints=dbgui"
+      - "traefik.http.services.dbgui-${ASPEN_STACK}.loadbalancer.server.port=80"
+
+networks:
+  aspen-proxy:
+    name: aspen-proxy
+    external: true

@@ -47,7 +47,7 @@ always; worktrees and named stacks get `http://<stack>.localhost:8083`.
 | `-d, --detached` | Run in detached mode |
 | `-g, --debugging` | Include the Xdebug overlay ([Debugging](debugging.md)) |
 | `-j, --java-debug` | Expose JDWP port 5005 and mount `debug.sh` for Java debugging |
-| `-b, --dbgui` | Include phpMyAdmin on localhost:8085 |
+| `-b, --dbgui` | Include phpMyAdmin on port 8085 (served on the instance hostname when proxied) |
 | `-p, --pull` | Pull registry images before starting |
 | `-i, --ils` | ILS preset name, path to a YAML config, or `none` (default: `koha`) |
 | `-k, --koha-stack` | koha-testing-docker stack to connect to (default: `kohadev`) |
