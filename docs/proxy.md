@@ -25,8 +25,9 @@ control:
 adb proxy up
 ```
 
-The Traefik dashboard is served at
-[aspen-proxy.localhost:8083](http://aspen-proxy.localhost:8083).
+The Traefik dashboard is served on its own port at
+[localhost:8090/dashboard/](http://localhost:8090/dashboard/). Override the
+port with `PROXY_DASHBOARD_PORT`.
 
 ## Proxying an Aspen stack
 

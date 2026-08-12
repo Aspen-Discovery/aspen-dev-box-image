@@ -83,7 +83,7 @@ aspen stack by hostname on the external `aspen-proxy` network
 ([Aspen Proxy](proxy.md)) — usually unnecessary, since `adb up`/`adb down`
 manage it. It is fully independent of koha-testing-docker's proxy. The
 dashboard is served on
-[aspen-proxy.localhost:8083](http://aspen-proxy.localhost:8083).
+[localhost:8090/dashboard/](http://localhost:8090/dashboard/).
 
 ```shell
 adb proxy up

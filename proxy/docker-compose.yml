@@ -16,13 +16,9 @@ services:
       - "${PROXY_HTTP_PORT:-8083}:80"
       - "${PROXY_HTTPS_PORT:-8443}:443"
       - "${PROXY_SOLR_PORT:-8084}:8084"
+      - "${PROXY_DASHBOARD_PORT:-8090}:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - "aspen.proxy=true"
-      - "traefik.http.routers.aspen-proxy-api.rule=Host(`aspen-proxy.localhost`)"
-      - "traefik.http.routers.aspen-proxy-api.service=api@internal"
-      - "traefik.http.routers.aspen-proxy-api.entrypoints=web"
     networks:
       - aspen-proxy
 
