@@ -42,6 +42,7 @@ services:
     environment:
       - SOLR_PORT=8084
       - SOLR_HOST=solr
+      - SOLR_MODULES=analysis-extras
       - SOLR_OPTS=-Dsolr.config.lib.enabled=true
     ports:
       - "${SOLR_HOST_PORT:-8084}:8084"
