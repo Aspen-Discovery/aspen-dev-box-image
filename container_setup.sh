@@ -4,7 +4,9 @@ ensure_composer() {
     if [ ! -x /usr/local/bin/composer ]; then
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     fi
-    (cd /usr/local/aspen-discovery/code/web && /usr/local/bin/composer install --no-interaction --prefer-dist)
+    if ! (cd /usr/local/aspen-discovery && /usr/local/bin/composer install --no-interaction --prefer-dist); then
+        echo "WARNING: composer install failed; continuing without installing PHP dependencies"
+    fi
 }
 
 remap_www_data() {
