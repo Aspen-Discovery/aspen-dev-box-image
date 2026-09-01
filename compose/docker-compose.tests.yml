@@ -5,6 +5,7 @@ services:
     environment:
       - LOCAL_USER_ID=${UID:-501}
       - LOCAL_GROUP_ID=${GID:-20}
+      - TZ=${TIMEZONE:-Europe/London}
     volumes:
       - "$ASPEN_DOCKER/run_unit_tests.sh:/entrypoint.sh"
       - "$ASPEN_DOCKER/container_setup.sh:/container_setup.sh:ro"
