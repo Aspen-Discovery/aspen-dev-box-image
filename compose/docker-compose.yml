@@ -1,0 +1,83 @@
+services:
+  aspen-dev-box:
+    image: aspendiscovery/aspen:latest
+    env_file: ${ASPEN_DOCKER}/.env
+    environment:
+      - LOCAL_USER_ID=${UID:-501}
+      - LOCAL_GROUP_ID=${GID:-20}
+      - TZ=${TIMEZONE:-Europe/London}
+    volumes:
+      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
+      - "$ASPEN_DOCKER/container_setup.sh:/container_setup.sh:ro"
+      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
+      - "$ASPEN_DOCKER/aliases:/var/www/.bashrc"
+      - "$ASPEN_DOCKER/seeder:/seeder:ro"
+    ports:
+      - "${ASPEN_PORT:-8083}:80"
+    networks:
+      - aspen-net
+    tty: true
+    depends_on:
+      aspen-db:
+        condition: service_healthy
+
+  aspen-db:
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD:-aspen}
+      - MARIADB_DATABASE=${DATABASE_NAME:-aspen}
+      - MARIADB_USER=${DATABASE_USER:-aspensuper}
+      - MARIADB_PASSWORD=${DATABASE_PASSWORD:-aspensuper}
+    image: "mariadb:10.11.5"
+    volumes:
+      - $ASPEN_CLONE/install/aspen.sql:/docker-entrypoint-initdb.d/Aspen-db-startup.sql
+    healthcheck:
+      interval: 10s
+      retries: 30
+      test: [ "CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized" ]
+    networks:
+      - aspen-net
+
+  solr:
+    image: ${SOLR_IMAGE:-solr:9}
+    attach: false
+    environment:
+      - SOLR_PORT=8084
+      - SOLR_HOST=solr
+      - SOLR_MODULES=analysis-extras
+      - SOLR_OPTS=-Dsolr.config.lib.enabled=true
+    ports:
+      - "${SOLR_HOST_PORT:-8084}:8084"
+    volumes:
+      - ${SOLR_CONFIGSETS:-$ASPEN_CLONE/data_dir_setup/solr7}:/opt/solr/server/solr/configsets
+    deploy:
+      endpoint_mode: dnsrr
+    networks:
+      - aspen-net
+    depends_on:
+      - aspen-dev-box
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -s --noproxy '*' 'http://localhost:8084/solr/admin/cores?action=STATUS&wt=json' | grep -qE '"initFailures":\{ *\}'
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    entrypoint:
+      - /bin/bash
+      - '-c'
+      - |
+        set -e
+        init-var-solr
+        cd /var/solr/data
+        for core_dir in /opt/solr/server/solr/configsets/*/; do
+          core=$$(basename "$$core_dir")
+          precreate-core "$$core" "$$core_dir"
+          cp -r "$$core_dir"* "$$core/"
+        done
+        exec solr-foreground
+
+
+networks:
+  aspen-net:
+    driver: bridge

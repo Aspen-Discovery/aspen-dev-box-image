@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Listen for Xdebug",
+            "name": "Aspen container: Listen for Xdebug",
             "type": "php",
             "request": "launch",
             "port": 9003,
@@ -13,7 +13,7 @@
                 "max_depth": 20
             },
             "pathMappings": {
-                "/usr/local/aspen-discovery": "${workspaceRoot}"
+                "/usr/local/aspen-discovery": "${workspaceFolder}"
               }
         },
         {
@@ -42,7 +42,7 @@
                 "localhost:0"
             ],
             "program": "",
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}",
             "port": 9003,
             "serverReadyAction": {
                 "pattern": "Development Server \\(http://localhost:([0-9]+)\\) started",

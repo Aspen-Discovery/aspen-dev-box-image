@@ -1,0 +1,71 @@
+base: _base.yml
+
+driver: Evergreen
+
+account_profile:
+  id: 2
+  name: ils
+  driver: Evergreen
+  loginConfiguration: barcode_pin
+  authenticationMethod: ils
+  vendorOpacUrl: http://evergreen-ils/eg/opac/home
+  patronApiUrl: http://evergreen-ils
+  recordSource: ils
+  weight: 2
+  databaseTimezone: GMT
+  staffUsername: admin
+  staffPassword: demo123
+  ils: evergreen
+
+indexing_profile:
+  indexingClass: Evergreen
+  catalogDriver: Evergreen
+  formatSource: bib
+  recordNumberTag: '901'
+  recordNumberField: a
+  itemTag: '852'
+  itemRecordNumber: p
+  callNumberPrestamp: k
+  callNumber: j
+  callNumberPoststamp: m
+  location: b
+  locationsToSuppress: COMCAT
+  status: s
+  iType: g
+  useICode2Suppression: 1
+  format: g
+  collection: c
+  volume: ''
+  totalCheckouts: ''
+  totalRenewals: ''
+  dueDate: ''
+  dateCreated: ''
+  dateCreatedFormat: ''
+  nonHoldableStatuses: 'Bindery|ILL|Cataloging|Reserves|Walkin Loan|View Online|Library Use Only|Offsite|Claimed Returned|INN-Reach Offsite|Cancelled|Ask Your Library|On reservation shelf'
+  specifiedFormatBoost: 1
+  treatUnknownLanguageAs: English
+  treatUndeterminedLanguageAs: English
+  treatUnknownAudienceAs: General
+  checkRecordForLargePrint: 1
+  includeLocationNameInDetailedLocation: 1
+  suppressRecordsWithUrlsMatching: 'overdrive.com|contentreserve.com|hoopla|axis360.baker-taylor.com|kanopy.com|ebscohost.com'
+  hideUnknownLiteraryForm: 1
+  hideNotCodedLiteraryForm: 1
+  treatLibraryUseOnlyGroupedStatusesAsAvailable: 1
+  customMarcFieldsToIndexAsKeyword: '010z:020z:024z:028z'
+  evergreenOrgUnitSchema: 2
+  index856Links: 1
+  includePersonalAndCorporateNamesInTopics: 1
+  orderRecordsStatusesToInclude: o|1
+  orderRecordsToSuppressByDate: 1
+  customFacet1SourceField: 655$7a
+  customFacet1ValuesToInclude: '.*'
+  customFacet2SourceField: 250a
+  customFacet2ValuesToInclude: '(^\[Hardcover edition\]$|^\[Paperback edition\]$)'
+  customFacet3ValuesToInclude: '.*'
+  numMillisecondsToPauseAfterBibLookups: 50
+  numExtractionThreads: 5
+  bibCallNumberFields: '99:92:82'
+  replacementCostSubfield: y
+
+extras_sql: ils/extras/evergreen.sql

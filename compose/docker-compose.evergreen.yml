@@ -1,0 +1,37 @@
+services:
+  aspen-dev-box:
+    volumes:
+      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
+      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
+      - "$ASPEN_DOCKER/aliases:/root/.bashrc"
+      - "$ASPEN_DOCKER/export_utils:/mnt/export_utils"
+    networks:
+      - aspen-net
+      - evergreen-net
+
+  aspen-db:
+    networks:
+      - aspen-net
+      - evergreen-net
+
+  evergreen-ils:
+    stdin_open: true
+    tty: true
+    ports:
+      - "${EVERGREEN_HTTP_PORT:-80}:80"
+      - "${EVERGREEN_HTTPS_PORT:-443}:443"
+      - "${EVERGREEN_SIP_PORT:-210}:210"
+      - "${EVERGREEN_WS_PORT:-6001}:6001"
+      - "${EVERGREEN_SSH_PORT:-32}:22"
+      - "${EVERGREEN_PSQL_PORT:-5433}:5432"
+    hostname: app.evergreen.com
+    image: mobiusoffice/evergreen-ils
+    volumes:
+      - "$ASPEN_DOCKER/export_utils:/mnt/export_utils"
+    networks:
+      - evergreen-net
+
+networks:
+  evergreen-net:
+    name: evergreen-net
+    driver: bridge 

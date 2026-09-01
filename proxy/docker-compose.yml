@@ -1,0 +1,30 @@
+services:
+  proxy:
+    image: traefik:v3
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.solr.address=:8084"
+      - "--entrypoints.dbgui.address=:8085"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=true"
+      - "--providers.docker.constraints=Label(`aspen.proxy`,`true`)"
+      - "--providers.docker.network=aspen-proxy"
+    ports:
+      - "${PROXY_HTTP_PORT:-8083}:80"
+      - "${PROXY_HTTPS_PORT:-8443}:443"
+      - "${PROXY_SOLR_PORT:-8084}:8084"
+      - "${PROXY_DBGUI_PORT:-8085}:8085"
+      - "${PROXY_DASHBOARD_PORT:-8090}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - aspen-proxy
+
+networks:
+  aspen-proxy:
+    name: aspen-proxy
+    external: true

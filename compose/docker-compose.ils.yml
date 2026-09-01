@@ -1,0 +1,4 @@
+services:
+  aspen-db:
+    volumes:
+      - "${ADB_ILS_SQL}:/docker-entrypoint-initdb.d/zzz-ils-setup.sql:ro"

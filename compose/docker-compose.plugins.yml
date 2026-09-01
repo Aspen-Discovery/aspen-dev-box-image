@@ -1,0 +1,6 @@
+services:
+  aspen-dev-box:
+    volumes:
+      - "${ASPEN_PLUGINS:-$ASPEN_DOCKER/plugins}:/plugins"
+    environment:
+      - ASPEN_PLUGINS_ENABLED=1

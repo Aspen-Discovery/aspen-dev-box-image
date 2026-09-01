@@ -1,0 +1,13 @@
+services:
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "${DBGUI_PORT:-8085}:80"
+    environment:
+      #- PMA_ARBITRARY=1
+      - PMA_HOST=aspen-db
+      - PMA_USER=aspensuper
+      - PMA_PASSWORD=aspensuper
+    networks:
+      - aspen-net

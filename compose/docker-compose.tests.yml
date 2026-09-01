@@ -1,0 +1,21 @@
+services:
+  unit-tests:
+    image: aspendiscovery/aspen:latest
+    env_file: ${ASPEN_DOCKER}/.env
+    environment:
+      - LOCAL_USER_ID=${UID:-501}
+      - LOCAL_GROUP_ID=${GID:-20}
+      - TZ=${TIMEZONE:-Europe/London}
+    volumes:
+      - "$ASPEN_DOCKER/run_unit_tests.sh:/entrypoint.sh"
+      - "$ASPEN_DOCKER/container_setup.sh:/container_setup.sh:ro"
+      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
+    tmpfs:
+      - /usr/local/aspen-discovery/sites/unit_tests.localhost
+    networks:
+      - aspen-net
+    profiles:
+      - tests
+    depends_on:
+      aspen-db:
+        condition: service_healthy

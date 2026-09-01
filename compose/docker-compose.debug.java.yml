@@ -1,0 +1,7 @@
+services:
+  aspen-dev-box:
+    ports:
+      - "${JAVA_DEBUG_PORT:-5005}:5005"
+    volumes:
+      - "$ASPEN_DOCKER/debug.sh:/debug.sh"
+

@@ -1,93 +1,43 @@
-#  Aspen Dev Environment
+# Aspen Dev Environment
 
-This is an Aspen-discovery Docker instance designed to make developing Aspen 
-easier. 
-
-Still in early stages and there are a number of improvements to be made
+A Docker-based development environment for [Aspen Discovery](https://github.com/Aspen-Discovery/aspen-discovery),
+driven by the `adb` CLI. It runs Aspen, MariaDB and Solr in containers with your
+local Aspen clone bind-mounted in. It integrates with
+[koha-testing-docker](https://gitlab.com/koha-community/koha-testing-docker) as
+the default ILS.
 
 ## Requirements
 
-### Software
-
-This project is self contained and all you need is:
-
-- A text editor to tweak configuration files
-- Docker ([install instructions](https://docs.docker.com/engine/install/))
+- Docker ([download](https://www.docker.com/get-started/))
 - Docker Compose v2 ([install instructions](https://docs.docker.com/compose/install/linux/#install-using-the-repository))
+- A local clone of aspen-discovery
 
-Note: **Windows** and **macOS** users use [Docker Desktop](https://docs.docker.com/compose/install/compose-desktop/) which already ships Docker Compose v2.
+Note: **Windows** and **macOS** users use [Docker Desktop](https://www.docker.com/get-started/) which already ships Docker Compose v2.
 
-## Setup
+## Quick start
 
-It is not a bad idea to organize your projects in a directory. For the purpose
-of simplifying the instructions we pick `~/git` as the place in which to put
-all the repository clones:
-
-```shell
-mkdir -p ~/git
-export PROJECTS_DIR=~/git
-```
-
-* Clone the `aspen-dev-box` project:
+You need to do the one-time setup first: clone both repositories, set the
+environment variables (`ASPEN_DOCKER`, `ASPEN_CLONE`, `UID`, `GID`), put the
+`adb` binary on your PATH and copy `.env.example` to `.env`.
+[Getting Started](docs/getting-started.md) covers all of this. Once that's
+done, starting the dev box is:
 
 ```shell
-cd $PROJECTS_DIR
-git clone https://github.com/Aspen-Discovery/aspen-dev-box-image.git aspen-dev-box
+adb up -d
 ```
 
-* Clone the `aspen-discovery` project (skip and adjust the paths if you already have it):
--- I would recommend forking the below repository and cloning your fork for this.
+- [localhost:8083](http://localhost:8083) — the Aspen Discovery interface
+- [localhost:8084](http://localhost:8084) — the Solr dashboard (with `--no-proxy`)
 
-```shell
-cd $PROJECTS_DIR
-git clone https://github.com/Aspen-Discovery/aspen-discovery.git aspen-discovery
-```
+Behind the scenes this runs through the aspen proxy, so additional instances
+(e.g. [git worktrees](docs/proxy.md) of your clone) are served side by side on
+`http://<name>.localhost:8083` with no port juggling.
 
-* Set some **mandatory** environment variables in your .bashrc (or .zshrc):
+**Note:** by default `adb up` connects to a running
+[koha-testing-docker](https://gitlab.com/koha-community/koha-testing-docker)
+stack. Start that first, or run `adb up --ils none` for a standalone Aspen.
 
-```shell
-echo "export PROJECTS_DIR=$PROJECTS_DIR" >> ~/.bashrc
-echo 'export ASPEN_CLONE=$PROJECTS_DIR/aspen-discovery' >> ~/.bashrc
-echo 'export ASPEN_DOCKER=$PROJECTS_DIR/aspen-dev-box'  >> ~/.bashrc
-echo 'export UID=$(id -u)' >> ~/.bashrc
-echo 'export GID=$(id -g)' >> ~/.bashrc
-[ "$(uname)" == "Darwin" ] && echo 'export PATH=$PATH:$ASPEN_DOCKER/bin/darwin' >> ~/.bashrc
-[ "$(uname)" == "Linux" ] && echo 'export PATH=$PATH:$ASPEN_DOCKER/bin/linux' >> ~/.bashrc
-```
-
-The `UID` and `GID` exports are required so the container can match its
-internal users to your host user, avoiding file permission issues on
-bind-mounted source code.
-
-**Note:** you will need to log out and log back in (or start a new terminal window) for this to take effect.
-
-* Copy the example environment file and adjust to taste:
-
-```shell
-cd $ASPEN_DOCKER
-cp .env.example .env
-```
-
-Review `.env` and change any values that differ from your local setup (site name, timezone, passwords, etc.).
-
-* Now you can start up your devbox
-
-```shell
-cd $ASPEN_DOCKER
-docker compose up
-```
-
-## USAGE:
-This project exposes port 8083 and 8084: 
-
-* [localhost:8083](http://localhost:8083) will take you to the discovery page where you can interact with aspen-discovery
-
-* [localhost:8084](http://localhost:8084) will take you to the solr dashboard.
-
-* Running `newSQL.sh` will update the DB setup file to the latest version contained within your aspen-discovery clone.
-
-**LOGINS:**
-Listed below are the default logins for both the Database and Aspen discovery interface
+**Logins:**
 
 * Discovery:
 ```
@@ -98,23 +48,15 @@ Password: password
 ```
 Username: root
 Password: aspen
-Table: aspen
-```
-### DEBUGGING:
-*IMPORTANT*
-if on WSL please also place this in your .bashrc (or equivalent) and restart your shell as above
-```
-export WSL_IP=$(ip addr show eth0 | awk '/inet / {print $2}' | cut -d/ -f1)
-```
-You should also sym link your aspen clone to the default install location for production installs so the debugger can link files. 
-Please open your IDE from this location if debugging.
-```
-sudo ln -s $ASPEN_CLONE /usr/local/aspen-discovery
+Database: aspen
 ```
 
-An alternative to this is to setup path mappings in your debug configurations for your IDE. 
-VSCode mappings are included in the repository and can be copied to the correct location with the below command:
-```
-cp $ASPEN_DOCKER/vscodedebugconfig.json $ASPEN_CLONE/.vscode/launch.json
-cp $ASPEN_DOCKER/vscodetasksconfig.json $ASPEN_CLONE/.vscode/tasks.json
-```
+## Documentation
+
+- [Getting Started](docs/getting-started.md) — prerequisites, environment variables, first boot
+- [CLI Reference](docs/cli-reference.md) — every `adb` command and flag
+- [Debugging](docs/debugging.md) — PHP step debugging with Xdebug, Java debugging
+- [ILS Integration](docs/ils-integration.md) — Koha, Evergreen and custom ILS configs
+- [Plugins](docs/plugins.md) — developing Aspen plugins against the dev box
+- [Aspen Proxy](docs/proxy.md) — hostname routing for multiple side-by-side stacks
+- [Services & Configuration](docs/services-and-configuration.md) — containers, compose overlays, `.env` reference

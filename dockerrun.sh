@@ -2,22 +2,21 @@
 #
 
 set -e
-if [ ! -x /usr/local/bin/composer ]; then
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-fi
-cd /usr/local/aspen-discovery/code/web && /usr/local/bin/composer install --no-interaction --prefer-dist
+source /container_setup.sh
+
+ensure_composer
 
 SITENAME="${SITE_NAME:-test.localhostaspen}"
 LOCAL_USER_ID="${LOCAL_USER_ID:-501}"
 LOCAL_GROUP_ID="${LOCAL_GROUP_ID:-20}"
+PHP_VERSION=$(php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;')
 
 echo "Configuring container users to match host (UID=${LOCAL_USER_ID}, GID=${LOCAL_GROUP_ID})..."
 
 # Remap www-data group GID — PHP-FPM (group=www-data) and Apache (APACHE_RUN_GROUP)
 # resolve this group name at runtime, so it must carry the host GID.
-groupmod -o -g "${LOCAL_GROUP_ID}" www-data
+remap_www_data
 getent group aspen_apache > /dev/null 2>&1 || groupadd -o -g "${LOCAL_GROUP_ID}" aspen_apache
-usermod -o -u "${LOCAL_USER_ID}" -s /bin/bash www-data
 usermod -a -G aspen_apache,sudo www-data
 
 if ! id aspen > /dev/null 2>&1; then
@@ -35,20 +34,14 @@ fi
 echo "www-data ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/www-data
 
 export CONFIG_DIRECTORY="/usr/local/aspen-discovery/sites/${SITENAME}"
-mkdir -p $CONFIG_DIRECTORY 2>/dev/null
+create_site_config "${CONFIG_DIRECTORY}"
 
 cd /usr/local/aspen-discovery/docker/files/scripts
 
-if [ ! -f "${CONFIG_DIRECTORY}/conf/config.ini" ]; then
-    echo "Creating site configuration for ${SITENAME}..."
-    php createConfig.php "${CONFIG_DIRECTORY}"
-else
-    echo "Site configuration exists..."
-fi 
 echo "syncing env vars..."
 php syncEnvToConfig.php || true
 
-if [ "${ASPEN_PLUGINS_ENABLED:-0}" = "1" ]; then
+if [ "${ASPEN_PLUGINS_ENABLED:-0}" = "1" ] && ! grep -q '^\[Plugins\]' "${CONFIG_DIRECTORY}/conf/config.ini"; then
     cat >> "${CONFIG_DIRECTORY}/conf/config.ini" <<'EOF'
 
 [Plugins]
@@ -69,7 +62,7 @@ chown -R www-data:www-data /usr/local/aspen-discovery/tmp /var/log/aspen-discove
 chown -R www-data:www-data "${CONFIG_DIRECTORY}"
 chown -R aspen:www-data /var/run/aspen
 cp "${CONFIG_DIRECTORY}/httpd-${SITENAME}.conf" /etc/apache2/sites-enabled/
-cp "${CONFIG_DIRECTORY}/conf/php-fpm.conf" /etc/php/8.4/fpm/pool.d/
+cp "${CONFIG_DIRECTORY}/conf/php-fpm.conf" "/etc/php/${PHP_VERSION}/fpm/pool.d/"
 
 echo "Running pending database updates..."
 php updateDatabase.php "${SITENAME}"
@@ -77,8 +70,21 @@ php updateDatabase.php "${SITENAME}"
 crontab "${CONFIG_DIRECTORY}/conf/crontab"
 service cron start
 
+if [ -f /aspen-dev-conf/xdebug.ini ]; then
+    if php -r 'exit(file_exists(ini_get("extension_dir") . "/xdebug.so") ? 0 : 1);'; then
+        phpenmod xdebug
+        ln -sf /aspen-dev-conf/xdebug.ini "/etc/php/${PHP_VERSION}/fpm/conf.d/99-xdebug.ini"
+    else
+        echo "WARNING: xdebug extension not present in this image, step debugging disabled"
+    fi
+fi
+
+if [ -f /aspen-dev-conf/error_reporting.ini ]; then
+    ln -sf /aspen-dev-conf/error_reporting.ini "/etc/php/${PHP_VERSION}/fpm/conf.d/error_reporting.ini"
+fi
+
 echo "Starting PHP-FPM..."
-php-fpm8.4 &
+"php-fpm${PHP_VERSION}" &
 
 echo "Waiting for PHP-FPM to be ready on port 9000..."
 for i in {1..10}; do
@@ -98,7 +104,7 @@ cat <<EOF
 
 ========================================
   Aspen dev box ready
-  URL:  http://localhost:${ASPEN_PORT:-8083}
+  URL:  ${URL:-http://localhost:${ASPEN_PORT:-8083}}
   Site: ${SITENAME}
 ========================================
 

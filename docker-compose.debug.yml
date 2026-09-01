@@ -1,9 +1,0 @@
-services:
-  aspen-dev-box:
-    volumes:
-      - '$ASPEN_DOCKER/error_reporting.ini:/etc/php/8.2/apache2/conf.d/error_reporting.ini'
-      - '$ASPEN_DOCKER/xdebug.ini:/etc/php/8.2/apache2/conf.d/20-xdebug.ini'
-    environment:
-      - WSL_IP
-    extra_hosts: 
-      - host.docker.internal:${WSL_IP:-host-gateway} 
