@@ -5,7 +5,7 @@
 | Service | Image | Ports | Purpose |
 |---------|-------|-------|---------|
 | `aspen-dev-box` | `aspendiscovery/aspen:latest` (`ASPEN_IMAGE`) | `8083:80` (`ASPEN_PORT`) | Aspen itself — Apache, PHP-FPM, cron, background jobs. Reports healthy once it serves its homepage |
-| `aspen-db` | `mariadb:10.11.5` | — | The Aspen database, initialised from `$ASPEN_CLONE/install/aspen.sql` |
+| `aspen-db` | `mariadb:10.11` | — | The Aspen database, initialised from `$ASPEN_CLONE/install/aspen.sql` |
 | `solr` | official `solr:<major>` (`SOLR_IMAGE`) | `8084:8084` (`SOLR_HOST_PORT`) | Solr with Aspen's cores precreated from the checkout's configsets |
 | `phpmyadmin` | `phpmyadmin` | `8085:80` (`DBGUI_PORT`) | Database GUI, only with `adb up -b` |
 
@@ -20,9 +20,16 @@ from `data_dir_setup/solr*/*/conf/solrconfig.xml` and uses the matching
 official `solr:<major>` image, mounting that directory as the configsets.
 `SOLR_IMAGE` and `SOLR_CONFIGSETS` override both.
 
-**Note:** the database has no persistent volume — `adb down` discards it and
+The site configuration (`sites/<SITE_NAME>`) lives on a tmpfs inside the
+container rather than in your clone, so it is rebuilt from `.env` on every
+boot; only an empty mount-point directory appears in the clone.
+
+**Note:** the database and Solr index live in the named volumes
+`<stack>_aspen-db-data` and `<stack>_solr-data`. `adb down` removes them, so
 the next `adb up` re-initialises from `aspen.sql` plus any ILS setup SQL.
-`adb stop`/`adb start`/`adb restart` keep it.
+`adb down --keep-data` keeps them for the next `adb up` of the same stack,
+`adb stop`/`adb start`/`adb restart` never touch them, and `adb db dump` /
+`adb db restore` snapshot the database to `.cache/snapshots`.
 
 ## Compose overlays
 
@@ -31,7 +38,7 @@ selects them by flag:
 
 | File | Added by | Purpose |
 |------|----------|---------|
-| `compose/docker-compose.debug.yml` | `adb up -g` | Xdebug config for PHP step debugging |
+| `compose/docker-compose.debug.yml` | `adb up -g` | Xdebug enabled from boot (`adb xdebug on` toggles it live) |
 | `compose/docker-compose.dbgui.yml` | `adb up -b` | phpMyAdmin |
 | `compose/docker-compose.ils.yml` | any `--ils` config | Applies the generated ILS setup SQL |
 | `compose/docker-compose.koha.yml` | `--ils koha` | Joins the koha-testing-docker network, OAuth provisioning |
@@ -66,6 +73,7 @@ your shell takes precedence over the file.
 | `ASPEN_PORT` / `SOLR_HOST_PORT` / `DBGUI_PORT` / `JAVA_DEBUG_PORT` | `8083` / `8084` / `8085` / `5005` | Host ports with `--no-proxy` (`JAVA_DEBUG_PORT` always binds, JDWP is not HTTP) |
 | `PROXY_HTTP_PORT` / `PROXY_HTTPS_PORT` / `PROXY_SOLR_PORT` / `PROXY_DBGUI_PORT` / `PROXY_DASHBOARD_PORT` | `8083` / `8443` / `8084` / `8085` / `8090` | Host ports the proxy binds ([Aspen Proxy](proxy.md)) |
 | `KOHA_STACK` | `kohadev` | koha-testing-docker stack to join; `adb up -k` sets it per run |
+| `ASPEN_CRON` | `1` | Set to `0` to boot without cron; `adb up --no-cron` sets it per run, `adb cron start|stop` toggles it live |
 | `PHP_FPM_HOST` / `PHP_FPM_PORT` | `127.0.0.1` / `9000` | Apache → PHP-FPM proxying inside the container |
 | `ASPEN_PLUGINS` | `$ASPEN_DOCKER/plugins` | Host plugins directory ([Plugins](plugins.md)) |
 
@@ -88,11 +96,13 @@ every start it:
 5. initialises the database and runs any pending database updates
 6. wires in the debug config when present
    ([Debugging](debugging.md#how-it-works))
-7. starts cron, PHP-FPM and Apache, then prints the
+7. starts cron (unless `ASPEN_CRON=0`), PHP-FPM and Apache, then prints the
    `Aspen dev box ready` banner
 
 `adb logs -c` shows this output; the container reports healthy (and
-`adb up --wait` returns) once Apache serves the homepage for `SITE_NAME`.
+`adb up --wait` returns) once Apache serves the homepage for `SITE_NAME`. A
+failing database update is logged as a warning and the site still starts,
+so you can inspect it with `adb logs -c` and retry with `adb updatedb`.
 
 ## In-container aliases
 

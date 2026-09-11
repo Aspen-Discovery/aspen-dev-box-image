@@ -56,11 +56,13 @@ always; worktrees and named stacks get `http://<stack>.localhost:8083`.
 | `--plugins-path` | Host path of the plugins dir (default: `$ASPEN_PLUGINS` or `$ASPEN_DOCKER/plugins`) |
 | `--no-proxy` | Bind host ports directly instead of routing through the proxy |
 | `--host` | Hostname to serve when proxied (default: `localhost` for the default instance, else `<stack>.localhost`) |
+| `--no-cron` | Boot with cron stopped so scheduled jobs stay quiet (`adb cron start` turns it on) |
 
 ```shell
 adb up -d                     # detached, default Koha integration
 adb up --wait                 # detached, returns once Aspen is serving pages
 adb up -d -g                  # with PHP debugging
+adb up -d --no-cron           # no scheduled jobs while you debug
 adb up --ils none             # standalone Aspen, no ILS
 adb up --ils evergreen        # Evergreen instead of Koha
 adb up -i /path/to/custom.yml # custom ILS config
@@ -70,13 +72,21 @@ adb up -d --no-proxy          # old-style host ports, no proxy involved
 
 ### `adb down`
 
-Stop and remove the project’s containers, volumes (the db state does not
-survive a down anyway) and generated ILS SQL. The aspen proxy
-is stopped along with the last proxied stack.
+Stop and remove the project’s containers, its database and Solr volumes and
+the generated ILS SQL, so the next `adb up` starts from a fresh database.
+`--keep-data` keeps the volumes and ILS SQL: the next `adb up` of the same
+stack reuses the database and index instead of re-initialising. The aspen
+proxy is stopped along with the last proxied stack.
 
 | Flag | Description |
 |------|-------------|
+| `--keep-data` | Keep the database and Solr volumes for the next `adb up` |
 | `--all` | Bring down every aspen stack (any worktree or stack name) and the proxy |
+
+```shell
+adb down                      # fresh database next time
+adb down --keep-data          # containers go, data stays
+```
 
 ### `adb stop`, `adb start`, `adb restart`
 
@@ -95,9 +105,10 @@ adb restart aspen-dev-box     # re-run the entrypoint only
 ### `adb ls`
 
 List every aspen stack docker knows about (the default instance, worktrees
-and `--stack` names) with its container state and health, URL, ILS and the
-clone it serves. The stack `adb` currently targets is marked with `*`.
-`adb list` and `adb ps` are aliases.
+and `--stack` names) with the state of its aspen, database and Solr
+containers, its URL, the ILS it is wired to (including whether the Koha OAuth
+setup succeeded) and the clone it serves. The stack `adb` currently targets
+is marked with `*`. `adb list` and `adb ps` are aliases.
 
 ### `adb doctor`
 
@@ -128,13 +139,19 @@ adb proxy down
 
 ### `adb pull`
 
-Pull the registry images for the selected compose files.
+Pull every image the dev box uses: everything referenced by the compose files
+(the stack, all overlays, the proxy) plus the JDK and less images behind
+`adb jarbuild` and `adb compilecss`. The Evergreen image is large and only
+pulled on request.
 
 | Flag | Description |
 |------|-------------|
-| `-g, --debugging` | Include the debugging compose file |
-| `-b, --dbgui` | Include the phpMyAdmin image |
-| `-e, --evergreen` | Include the Evergreen image |
+| `-e, --evergreen` | Also pull the Evergreen ILS image |
+
+### `adb version`
+
+Print the build version (`git describe` of the CLI source at build time), Go
+version and platform. `adb --version` prints the short form.
 
 ## Working with the running stack
 
@@ -151,22 +168,56 @@ available if you need root. Some helper aliases are preloaded, see
 View the site logs from the main container
 (`/var/log/aspen-discovery/<SITE_NAME>/`), or with `--container` the
 container's own output: the entrypoint progress and the
-`Aspen dev box ready` banner.
+`Aspen dev box ready` banner. `--service` shows the output of any other
+container of the stack.
 
 | Flag | Description |
 |------|-------------|
 | `-f, --follow` | Follow logs in real time |
 | `-i, --include-indexing` | Include the indexing logs |
-| `-c, --container` | Show the container's stdout (entrypoint, boot banner) instead of the site logs |
+| `-c, --container` | Show the aspen container's stdout (entrypoint, boot banner) instead of the site logs |
+| `-s, --service` | Show another service's container output: `aspen-db`, `solr`, `koha-oauth-init`, `phpmyadmin` |
 
 ```shell
 adb logs -f                   # site logs
 adb logs -c -f                # watch a boot
+adb logs --service solr       # why is Solr unhealthy
+adb logs --service koha-oauth-init
 ```
 
 ### `adb db`
 
-Open an interactive MariaDB shell connected to the Aspen database.
+Open an interactive MariaDB shell connected to the Aspen database, or manage
+snapshots of it. Snapshots are gzipped `mariadb-dump` files under
+`$ASPEN_DOCKER/.cache/snapshots/<stack>-<name>.sql.gz`, so they survive
+`adb down` and can be restored into a fresh stack.
+
+| Subcommand | Description |
+|------------|-------------|
+| `dump [name]` | Dump the database to a snapshot (default name `latest`) |
+| `restore [name]` | Replace the database contents with a snapshot; run `adb updatedb` afterwards if the schema has moved on |
+| `snapshots` | List this stack's snapshots |
+
+```shell
+adb db                        # interactive shell
+adb db dump before-migration
+adb db restore before-migration
+adb db snapshots
+```
+
+### `adb xdebug on|off|status`
+
+Enable or disable the Xdebug extension for web requests in the running
+container and reload PHP-FPM, without restarting the stack. `on` installs the
+settings from `xdebug.ini` in this repository (mode, client host,
+`start_with_request`); `status` reports what the running PHP-FPM has loaded.
+See [Debugging](debugging.md#php-step-debugging-xdebug).
+
+### `adb cron start|stop|status`
+
+Control the cron daemon that runs Aspen's scheduled jobs inside the
+container. Stop it while stepping through a job so the scheduler does not
+launch a second copy; `adb up --no-cron` boots with it already stopped.
 
 ### `adb updatedb`
 

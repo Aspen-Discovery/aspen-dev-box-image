@@ -2,7 +2,15 @@
 
 ## PHP step debugging (Xdebug)
 
-Start the stack with the debugging overlay:
+Switch Xdebug on in a running stack:
+
+```shell
+adb xdebug on
+adb xdebug status
+adb xdebug off
+```
+
+or start the stack with it already enabled:
 
 ```shell
 adb up -d -g
@@ -10,13 +18,16 @@ adb up -d -g
 
 ### How it works
 
-The overlay (`compose/docker-compose.debug.yml`) mounts `xdebug.ini` and
-`error_reporting.ini` from this repository into the container at
-`/aspen-dev-conf/`. On startup the entrypoint detects the container's PHP
-version and, when the Xdebug extension is present in the image, links the
-config into that version's PHP-FPM configuration. Web requests then run with
+`adb xdebug on` copies `xdebug.ini` from this repository into the
+container's PHP-FPM `conf.d`, enables the extension and reloads PHP-FPM;
+`off` reverses that. The overlay (`compose/docker-compose.debug.yml`) does the
+same at boot: it mounts `xdebug.ini` and `error_reporting.ini` into the
+container at `/aspen-dev-conf/` and the entrypoint links them into the
+detected PHP version's PHP-FPM configuration when the Xdebug extension is
+present in the image. Either way web requests then run with
 `xdebug.mode=develop,debug` and `xdebug.start_with_request=yes`, connecting
-out to your IDE at `host.docker.internal:9003`.
+out to your IDE at `host.docker.internal:9003` (the base stack resolves that
+name on Linux too via `host-gateway`).
 
 The Xdebug configuration applies to PHP-FPM (web requests) only, so cron and
 CLI scripts don't open debugger connections on every run. See

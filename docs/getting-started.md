@@ -5,6 +5,7 @@
 - Docker and Docker Compose v2 (Docker Desktop on macOS/Windows)
 - For the default Koha integration: a running
   [koha-testing-docker](https://gitlab.com/koha-community/koha-testing-docker) stack
+- On Windows, work inside WSL and follow the Linux steps below
 
 ## Clone the repositories
 
@@ -148,7 +149,9 @@ adb stop           # pause, keeping the database
 adb start          # resume
 adb restart        # re-run the entrypoint against the same database
 adb down           # remove everything, including the database
-adb pull           # update the published images
+adb down --keep-data   # remove containers but keep the database and Solr index
+adb db dump        # snapshot the database to .cache/snapshots
+adb pull           # update every image the dev box uses
 ```
 
 The full command set is in the [CLI Reference](cli-reference.md).
