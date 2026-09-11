@@ -34,7 +34,7 @@ services:
       - MARIADB_DATABASE=${DATABASE_NAME:-aspen}
       - MARIADB_USER=${DATABASE_USER:-aspensuper}
       - MARIADB_PASSWORD=${DATABASE_PASSWORD:-aspensuper}
-    image: "mariadb:10.11.5"
+    image: "mariadb:10.11"
     volumes:
       - $ASPEN_CLONE/install/aspen.sql:/docker-entrypoint-initdb.d/Aspen-db-startup.sql
     healthcheck:
