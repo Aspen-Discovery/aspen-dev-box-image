@@ -20,6 +20,8 @@ services:
       - "${ASPEN_PORT:-8083}:80"
     networks:
       - aspen-net
+    extra_hosts:
+      - host.docker.internal:${WSL_IP:-host-gateway}
     tty: true
     depends_on:
       aspen-db:
