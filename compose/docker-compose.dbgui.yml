@@ -7,7 +7,7 @@ services:
     environment:
       #- PMA_ARBITRARY=1
       - PMA_HOST=aspen-db
-      - PMA_USER=aspensuper
-      - PMA_PASSWORD=aspensuper
+      - PMA_USER=${DATABASE_USER:-aspensuper}
+      - PMA_PASSWORD=${DATABASE_PASSWORD:-aspensuper}
     networks:
       - aspen-net
