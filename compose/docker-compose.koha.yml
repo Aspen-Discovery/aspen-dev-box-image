@@ -19,6 +19,8 @@ services:
     command: ["sh", "/setup.sh"]
     environment:
       - KOHA_STACK=${KOHA_STACK:-kohadev}
+      - DATABASE_NAME=${DATABASE_NAME:-aspen}
+      - DATABASE_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD:-aspen}
     depends_on:
       aspen-db:
         condition: service_healthy
@@ -26,4 +28,4 @@ services:
 networks:
   kohanet:
     external: true
-    name: ${KOHA_STACK:-kohadev}_kohanet 
+    name: ${KOHA_STACK:-kohadev}_kohanet

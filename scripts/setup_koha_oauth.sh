@@ -17,7 +17,7 @@ if [ -z "$DB_CONTAINER" ] || [ -z "$KOHA_CONTAINER" ]; then
   exit 1
 fi
 
-EXISTING=$(docker exec "$DB_CONTAINER" mariadb -uroot -paspen aspen -sN -e \
+EXISTING=$(docker exec "$DB_CONTAINER" mariadb -uroot -p"${DATABASE_ROOT_PASSWORD:-aspen}" "${DATABASE_NAME:-aspen}" -sN -e \
   "SELECT IFNULL(oAuthClientId,'') FROM account_profiles WHERE id=2;")
 
 if [ -n "$EXISTING" ]; then
@@ -72,7 +72,7 @@ if [ -z "$CLIENT_ID" ] || [ -z "$SECRET" ]; then
   exit 1
 fi
 
-docker exec "$DB_CONTAINER" mariadb -uroot -paspen aspen -e \
+docker exec "$DB_CONTAINER" mariadb -uroot -p"${DATABASE_ROOT_PASSWORD:-aspen}" "${DATABASE_NAME:-aspen}" -e \
   "UPDATE account_profiles SET oAuthClientId='$CLIENT_ID', oAuthClientSecret='$SECRET' WHERE id=2;"
 
 echo "koha-oauth: keys configured"
