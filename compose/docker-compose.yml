@@ -14,6 +14,8 @@ services:
       - "$ASPEN_DOCKER/aliases:/var/www/.bashrc"
       - "$ASPEN_DOCKER/aliases:/root/.bashrc"
       - "$ASPEN_DOCKER/seeder:/seeder:ro"
+    tmpfs:
+      - /usr/local/aspen-discovery/sites/${SITE_NAME:-dev.localhost}
     ports:
       - "${ASPEN_PORT:-8083}:80"
     networks:
