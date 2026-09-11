@@ -1,9 +1,5 @@
 services:
   aspen-dev-box:
-    volumes:
-      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
-      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
-      - "$ASPEN_DOCKER/aliases:/root/.bashrc"
     networks:
       - aspen-net
       - kohanet
@@ -28,8 +24,6 @@ services:
         condition: service_healthy
 
 networks:
-  aspen-net:
-    driver: bridge
   kohanet:
     external: true
     name: ${KOHA_STACK:-kohadev}_kohanet 

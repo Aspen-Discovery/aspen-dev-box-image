@@ -1,9 +1,6 @@
 services:
   aspen-dev-box:
     volumes:
-      - "$ASPEN_DOCKER/dockerrun.sh:/entrypoint.sh"
-      - "$ASPEN_CLONE:/usr/local/aspen-discovery"
-      - "$ASPEN_DOCKER/aliases:/root/.bashrc"
       - "$ASPEN_DOCKER/export_utils:/mnt/export_utils"
     networks:
       - aspen-net
@@ -34,4 +31,4 @@ services:
 networks:
   evergreen-net:
     name: evergreen-net
-    driver: bridge 
+    driver: bridge

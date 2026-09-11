@@ -11,6 +11,7 @@ services:
       - "$ASPEN_DOCKER/container_setup.sh:/container_setup.sh:ro"
       - "$ASPEN_CLONE:/usr/local/aspen-discovery"
       - "$ASPEN_DOCKER/aliases:/var/www/.bashrc"
+      - "$ASPEN_DOCKER/aliases:/root/.bashrc"
       - "$ASPEN_DOCKER/seeder:/seeder:ro"
     ports:
       - "${ASPEN_PORT:-8083}:80"
