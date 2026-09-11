@@ -70,7 +70,11 @@ if ! php updateDatabase.php "${SITENAME}"; then
 fi
 
 crontab "${CONFIG_DIRECTORY}/conf/crontab"
-service cron start
+if [ "${ASPEN_CRON:-1}" = "1" ]; then
+    service cron start
+else
+    echo "Cron disabled (ASPEN_CRON=0); enable it with: adb cron start"
+fi
 
 if [ -f /aspen-dev-conf/xdebug.ini ]; then
     if php -r 'exit(file_exists(ini_get("extension_dir") . "/xdebug.so") ? 0 : 1);'; then
