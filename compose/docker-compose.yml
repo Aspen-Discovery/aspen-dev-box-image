@@ -1,6 +1,6 @@
 services:
   aspen-dev-box:
-    image: aspendiscovery/aspen:latest
+    image: ${ASPEN_IMAGE:-aspendiscovery/aspen:latest}
     env_file: ${ASPEN_DOCKER}/.env
     environment:
       - LOCAL_USER_ID=${UID:-501}
