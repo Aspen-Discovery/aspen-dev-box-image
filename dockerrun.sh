@@ -65,7 +65,9 @@ cp "${CONFIG_DIRECTORY}/httpd-${SITENAME}.conf" /etc/apache2/sites-enabled/
 cp "${CONFIG_DIRECTORY}/conf/php-fpm.conf" "/etc/php/${PHP_VERSION}/fpm/pool.d/"
 
 echo "Running pending database updates..."
-php updateDatabase.php "${SITENAME}"
+if ! php updateDatabase.php "${SITENAME}"; then
+    echo "WARNING: database updates failed; starting the site anyway so the container stays up (see adb logs -c, retry with adb updatedb)"
+fi
 
 crontab "${CONFIG_DIRECTORY}/conf/crontab"
 service cron start
