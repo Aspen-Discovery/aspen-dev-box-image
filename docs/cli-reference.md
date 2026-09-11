@@ -45,8 +45,9 @@ always; worktrees and named stacks get `http://<stack>.localhost:8083`.
 | Flag | Description |
 |------|-------------|
 | `-d, --detached` | Run in detached mode |
+| `--wait` | Detach and block until every service is healthy, i.e. Aspen answers on port 80 |
 | `-g, --debugging` | Include the Xdebug overlay ([Debugging](debugging.md)) |
-| `-j, --java-debug` | Expose JDWP port 5005 and mount `debug.sh` for Java debugging |
+| `-j, --java-debug` | Expose JDWP port 5005 for `adb debug` ([Debugging](debugging.md#java-debugging-jdwp)) |
 | `-b, --dbgui` | Include phpMyAdmin on port 8085 (served on the instance hostname when proxied) |
 | `-p, --pull` | Pull registry images before starting |
 | `-i, --ils` | ILS preset name, path to a YAML config, or `none` (default: `koha`) |
@@ -58,6 +59,7 @@ always; worktrees and named stacks get `http://<stack>.localhost:8083`.
 
 ```shell
 adb up -d                     # detached, default Koha integration
+adb up --wait                 # detached, returns once Aspen is serving pages
 adb up -d -g                  # with PHP debugging
 adb up --ils none             # standalone Aspen, no ILS
 adb up --ils evergreen        # Evergreen instead of Koha
@@ -75,6 +77,40 @@ is stopped along with the last proxied stack.
 | Flag | Description |
 |------|-------------|
 | `--all` | Bring down every aspen stack (any worktree or stack name) and the proxy |
+
+### `adb stop`, `adb start`, `adb restart`
+
+Stop, start or restart the stack's containers in place. Unlike `adb down`
+the containers, the database and the generated ILS SQL are kept, so `adb
+start` brings everything back as it was and `adb restart` re-runs the aspen
+entrypoint against the existing database (handy after editing
+`dockerrun.sh` or the site config). Pass service names to act on a subset.
+
+```shell
+adb stop                      # pause the stack, keep the database
+adb start
+adb restart aspen-dev-box     # re-run the entrypoint only
+```
+
+### `adb ls`
+
+List every aspen stack docker knows about (the default instance, worktrees
+and `--stack` names) with its container state and health, URL, ILS and the
+clone it serves. The stack `adb` currently targets is marked with `*`.
+`adb list` and `adb ps` are aliases.
+
+### `adb doctor`
+
+Check the machine before the first `adb up`: `ASPEN_DOCKER` and `ASPEN_CLONE`
+point at the right checkouts, `.env` exists, the host `UID`/`GID` mapping,
+the docker daemon and compose v2, the koha-testing-docker network the default
+`--ils koha` needs, and the host ports the proxy binds. Exits non-zero when
+something needs fixing. `adb doctor` is the one command that runs without
+`ASPEN_DOCKER`/`ASPEN_CLONE` set.
+
+| Flag | Description |
+|------|-------------|
+| `-k, --koha-stack` | koha-testing-docker stack whose network to look for (default: `kohadev`) |
 
 ### `adb proxy`
 
@@ -113,12 +149,20 @@ available if you need root. Some helper aliases are preloaded, see
 ### `adb logs`
 
 View the site logs from the main container
-(`/var/log/aspen-discovery/<SITE_NAME>/`).
+(`/var/log/aspen-discovery/<SITE_NAME>/`), or with `--container` the
+container's own output: the entrypoint progress and the
+`Aspen dev box ready` banner.
 
 | Flag | Description |
 |------|-------------|
 | `-f, --follow` | Follow logs in real time |
 | `-i, --include-indexing` | Include the indexing logs |
+| `-c, --container` | Show the container's stdout (entrypoint, boot banner) instead of the site logs |
+
+```shell
+adb logs -f                   # site logs
+adb logs -c -f                # watch a boot
+```
 
 ### `adb db`
 
@@ -139,12 +183,14 @@ arguments are passed through to phpunit.
 The suite drops and reimports the test database at the start of every run
 (the base `install/aspen.sql` schema plus the test data in
 `tests/unit_tests.sql`), so every run starts from the same state. Pending
-database updates are not applied, the schema is whatever aspen.sql contains
-in your clone.
+database updates are not applied unless you pass `--updatedb`, which the
+runner consumes (it is not forwarded to phpunit) and which makes the bootstrap
+apply them after the fresh import.
 
 ```shell
 adb tests
 adb tests --filter DateUtilsTests
+adb tests --updatedb --filter UserAPITests
 ```
 
 ### `adb run <job> [extra args...]`
@@ -161,6 +207,21 @@ a built `<module>.jar` can be run using its module name (`reindexer`,
 adb run list                  # list the jobs available in your clone
 adb run reindexer
 adb run koha_export
+```
+
+The job's exit code becomes `adb`'s exit code, so `adb run` works in scripts.
+
+### `adb debug <module> [extra args...]`
+
+Compile a Java module from source inside the container and run it under the
+JDWP agent, suspended until your IDE attaches on `localhost:5005`. Needs the
+stack up with `adb up -j`. Any module under `code/` with a
+`META-INF/MANIFEST.MF` is debuggable; `adb debug list` shows them. See
+[Debugging](debugging.md#java-debugging-jdwp).
+
+```shell
+adb debug list
+adb debug reindexer
 ```
 
 ### `adb seed <command> [args...]`
@@ -192,15 +253,22 @@ provisioned automatically ([ILS Integration](ils-integration.md#oauth)).
 
 ## Build tooling
 
-### `adb jarbuild`
+### `adb jarbuild [module]`
 
-Build Aspen's Java modules in a containerised JDK. Without flags it offers an
-interactive fuzzy-search of the available modules; shared java libraries are
-compiled in automatically when the module uses them.
+Build Aspen's Java modules in a containerised JDK 17 (`eclipse-temurin:17`,
+the same major version as the aspen image). Pass a module name to build that
+JAR, or run without arguments for an interactive fuzzy-search of the available
+modules; shared java libraries are compiled in automatically when the module
+uses them.
 
 | Flag | Description |
 |------|-------------|
 | `-a, --all` | Build every JAR |
+
+```shell
+adb jarbuild reindexer
+adb jarbuild --all
+```
 
 ### `adb compilecss`
 

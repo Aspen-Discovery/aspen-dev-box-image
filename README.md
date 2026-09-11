@@ -17,17 +17,17 @@ Note: **Windows** and **macOS** users use [Docker Desktop](https://www.docker.co
 ## Quick start
 
 You need to do the one-time setup first: clone both repositories, set the
-environment variables (`ASPEN_DOCKER`, `ASPEN_CLONE`, `UID`, `GID`), put the
-`adb` binary on your PATH and copy `.env.example` to `.env`.
-[Getting Started](docs/getting-started.md) covers all of this. Once that's
-done, starting the dev box is:
+environment variables (`ASPEN_DOCKER`, `ASPEN_CLONE`), put the `adb` binary
+on your PATH and copy `.env.example` to `.env`.
+[Getting Started](docs/getting-started.md) covers all of this, and
+`adb doctor` checks it. Once that's done, starting the dev box is:
 
 ```shell
 adb up -d
 ```
 
 - [localhost:8083](http://localhost:8083) — the Aspen Discovery interface
-- [localhost:8084](http://localhost:8084) — the Solr dashboard (with `--no-proxy`)
+- [localhost:8084](http://localhost:8084) — the Solr dashboard
 
 Behind the scenes this runs through the aspen proxy, so additional instances
 (e.g. [git worktrees](docs/proxy.md) of your clone) are served side by side on

@@ -39,19 +39,20 @@ Set some **mandatory** environment variables in your .bashrc (or .zshrc):
 echo "export PROJECTS_DIR=$PROJECTS_DIR" >> ~/.bashrc
 echo 'export ASPEN_CLONE=$PROJECTS_DIR/aspen-discovery' >> ~/.bashrc
 echo 'export ASPEN_DOCKER=$PROJECTS_DIR/aspen-dev-box'  >> ~/.bashrc
-echo 'export UID=$(id -u)' >> ~/.bashrc
-echo 'export GID=$(id -g)' >> ~/.bashrc
 [ "$(uname)" == "Darwin" ] && echo 'export PATH=$PATH:$ASPEN_DOCKER/bin/darwin' >> ~/.bashrc
 [ "$(uname)" == "Linux" ] && echo 'export PATH=$PATH:$ASPEN_DOCKER/bin/linux' >> ~/.bashrc
 ```
 
-The `UID` and `GID` exports are required so the container can match its
-internal users to your host user, avoiding file permission issues on
-bind-mounted source code.
+The container maps its internal users to your host user so files created on
+the bind-mounted clone stay yours. `adb` passes your user and group id to
+docker compose itself (as `UID`/`GID`), so nothing needs exporting for this;
+if you do export `UID`/`GID` in your shell those values win.
 
 The `PATH` line puts the `adb` CLI on your path. Pre-built binaries for macOS,
 Linux and Windows ship in `bin/`; the CLI source lives at
 [aspen-dev-box-cli](https://github.com/aspen-discovery/aspen-dev-box-cli).
+`adb` reads `$ASPEN_DOCKER/.env` for its own settings, so the binary can live
+anywhere on your `PATH`.
 
 **Note:** you will need to log out and log back in (or start a new terminal
 window) for this to take effect.
@@ -78,6 +79,17 @@ Review `.env` and change any values that differ from your local setup (site
 name, timezone, passwords, etc.). See
 [Services & Configuration](services-and-configuration.md) for what each value
 does.
+
+## Check the setup
+
+```shell
+adb doctor
+```
+
+This verifies the environment variables, `.env`, the user id mapping, docker
+and compose, whether the koha-testing-docker network exists and whether the
+proxy ports are free, and tells you what to fix. It is the one `adb` command
+that works before `ASPEN_DOCKER` and `ASPEN_CLONE` are set.
 
 ## Koha integration (default)
 
@@ -110,8 +122,11 @@ any pending database updates and starts cron, PHP-FPM and Apache. Watch
 progress with:
 
 ```shell
-adb logs -f
+adb logs -c -f
 ```
+
+or use `adb up --wait` instead of `-d` to have the command return only once
+Aspen is serving pages. `adb ls` shows the stack's state and URL at any time.
 
 Once you see the `Aspen dev box ready` banner:
 
@@ -126,9 +141,13 @@ Direct database access is available with `adb db` (`root` / `aspen`), or run
 
 ```shell
 adb up -d          # start (koha-testing-docker must be up)
+adb ls             # what is running, and where
 adb logs -f        # follow the site logs
 adb shell          # shell inside the aspen container
-adb down           # stop everything
+adb stop           # pause, keeping the database
+adb start          # resume
+adb restart        # re-run the entrypoint against the same database
+adb down           # remove everything, including the database
 adb pull           # update the published images
 ```
 
@@ -136,13 +155,18 @@ The full command set is in the [CLI Reference](cli-reference.md).
 
 ## Troubleshooting
 
+Run `adb doctor` first; it covers most of the below.
+
 1. **`kohanet` network not found**: start koha-testing-docker, or use
    `adb up --ils none`.
-2. **Port conflicts**: ports 8083 and 8084 (and 8085 with `--dbgui`) must be
-   free; override the Aspen port with `ASPEN_PORT` in `.env`.
+2. **Port conflicts**: the proxy needs 8083, 8084, 8085 and 8090 free
+   (override with `PROXY_*_PORT` in `.env`); with `--no-proxy` the stack
+   binds 8083 and 8084 directly (`ASPEN_PORT`, `SOLR_HOST_PORT`).
 3. **Missing environment variables**: `adb` refuses to run without
    `ASPEN_DOCKER` and `ASPEN_CLONE`.
-4. **File permission errors on the clone**: check the `UID`/`GID` exports are
-   present in your shell before starting the stack.
+4. **File permission errors on the clone**: `adb doctor` shows the `UID`/`GID`
+   the containers will use; they should match `id -u` / `id -g`.
 5. **Debugger not connecting on WSL**: verify `WSL_IP` is exported and your
    shell was restarted.
+6. **Container exits during boot**: `adb logs -c` shows the entrypoint output,
+   including any failing database update.
