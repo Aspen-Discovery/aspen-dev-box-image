@@ -4,15 +4,25 @@
     {
       "label": "Run Debug Script",
       "type": "shell",
-      "command": "docker exec $(docker ps -q --filter name=aspen-dev-box-1) /debug.sh ${input:projectArg}",
-      "problemMatcher": []
+      "command": "adb debug ${input:projectArg}",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Compiling .* for debugging",
+          "endsPattern": "Waiting for a debugger to attach"
+        }
+      }
     }
   ],
   "inputs": [
     {
       "id": "projectArg",
       "type": "promptString",
-      "description": "Enter the name of the project you want to debug. Default : koha_export",
+      "description": "Module under code/ to debug (adb debug list shows them). Default: koha_export",
       "default": "koha_export"
     }
   ]

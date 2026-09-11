@@ -99,20 +99,23 @@ other flags, e.g. `-g`):
 adb up -d -j
 ```
 
-Then, from a shell in the container (`adb shell`), start the job you want to
-debug with the bundled script:
+Then start the job you want to debug from the host:
 
 ```shell
-/debug.sh reindexer
+adb debug list            # modules that can be debugged
+adb debug reindexer
+adb debug koha_export
 ```
 
-The script compiles the module and waits for a debugger to attach on port 5005
-before running. Supported projects: `koha_export`, `oai_indexer`,
-`overdrive_extract`, `palace_project_export`, `polaris_export`, `reindexer`,
-`series_indexer`, `sideload_processing`, `sierra_export_api`,
-`symphony_export`, `user_list_indexer`.
+`adb debug` compiles the module from source inside the container (pulling in
+the shared java libraries when the module imports them), then runs its
+`Main-Class` from the manifest with the JDWP agent, suspended until a debugger
+attaches on `localhost:5005`. Any module under `code/` with a
+`META-INF/MANIFEST.MF` is debuggable, so new modules work without changes here.
+Extra arguments after the module name are passed to the job after the site
+name. Ctrl-C stops the job.
 
 The shipped `vscodedebugconfig.json` includes a matching
-**"Debug Java in Docker"** attach configuration for `localhost:5005`.
-`vscodetasksconfig.json` provides a "Run Debug Script" task that runs
-`debug.sh` in the container.
+**"Debug Java in Docker"** attach configuration for `localhost:5005`; it
+prompts for the module, runs `adb debug` through the "Run Debug Script" task
+in `vscodetasksconfig.json` and attaches once compilation finishes.

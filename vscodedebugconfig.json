@@ -58,9 +58,18 @@
             "hostName": "localhost",
             "port": 5005,
             "sourcePaths": [
-                "${workspaceFolder}/code/koha_export/src"
+                "${workspaceFolder}/code/${input:projectArg}/src",
+                "${workspaceFolder}/code/java_shared_libraries/src"
             ],
             "preLaunchTask": "Run Debug Script"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "projectArg",
+            "type": "promptString",
+            "description": "Module under code/ to debug (adb debug list shows them). Default: koha_export",
+            "default": "koha_export"
         }
     ]
 }
