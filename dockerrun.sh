@@ -4,8 +4,6 @@
 set -e
 source /container_setup.sh
 
-ensure_composer
-
 SITENAME="${SITE_NAME:-test.localhostaspen}"
 LOCAL_USER_ID="${LOCAL_USER_ID:-501}"
 LOCAL_GROUP_ID="${LOCAL_GROUP_ID:-20}"
@@ -32,6 +30,8 @@ else
 fi
 
 echo "www-data ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/www-data
+
+ensure_composer
 
 export CONFIG_DIRECTORY="/usr/local/aspen-discovery/sites/${SITENAME}"
 create_site_config "${CONFIG_DIRECTORY}"
@@ -68,6 +68,7 @@ echo "Running pending database updates..."
 if ! php updateDatabase.php "${SITENAME}"; then
     echo "WARNING: database updates failed; starting the site anyway so the container stays up (see adb logs -c, retry with adb updatedb)"
 fi
+chown -R www-data:www-data /usr/local/aspen-discovery/tmp
 
 crontab "${CONFIG_DIRECTORY}/conf/crontab"
 if [ "${ASPEN_CRON:-1}" = "1" ]; then
