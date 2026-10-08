@@ -10,6 +10,7 @@ services:
       - "--entrypoints.solr.address=:8084"
       - "--entrypoints.dbgui.address=:8085"
       - "--providers.docker=true"
+      - "--providers.docker.endpoint=tcp://docker-socket:2375"
       - "--providers.docker.exposedbydefault=true"
       - "--providers.docker.constraints=Label(`aspen.proxy`,`true`)"
       - "--providers.docker.network=aspen-proxy"
@@ -19,12 +20,25 @@ services:
       - "${PROXY_SOLR_PORT:-8084}:8084"
       - "${PROXY_DBGUI_PORT:-8085}:8085"
       - "${PROXY_DASHBOARD_PORT:-8090}:8080"
+    depends_on:
+      - docker-socket
+    networks:
+      - aspen-proxy
+      - docker-socket
+
+  docker-socket:
+    image: tecnativa/docker-socket-proxy:0.3.0
+    restart: unless-stopped
+    environment:
+      CONTAINERS: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - aspen-proxy
+      - docker-socket
 
 networks:
   aspen-proxy:
     name: aspen-proxy
     external: true
+  docker-socket:
+    internal: true
