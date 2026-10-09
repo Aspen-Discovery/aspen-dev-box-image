@@ -13,8 +13,8 @@ account_profile:
   recordSource: ils
   weight: 1
   databaseHost: ${KOHA_STACK}-db-1
-  databaseName: koha_${KOHA_STACK}
-  databaseUser: koha_${KOHA_STACK}
+  databaseName: koha_${KOHA_INSTANCE}
+  databaseUser: koha_${KOHA_INSTANCE}
   databasePassword: password
   databasePort: 3306
   databaseTimezone: GMT
